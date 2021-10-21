@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name PEEPROM)(type Legacy)(uri /home/tristan/pCloudDrive/z80/KiCAD/2021-10-14_17-07-37/2021-10-14_17-07-37.lib)(options "")(descr ""))
+  (lib (name SN74AC32)(type Legacy)(uri /home/tristan/pCloudDrive/z80/KiCAD/or/2021-10-17_12-04-32.lib)(options "")(descr ""))
+  (lib (name z80-rescue)(type Legacy)(uri ${KIPRJMOD}/z80-rescue.lib)(options "")(descr ""))
+)
