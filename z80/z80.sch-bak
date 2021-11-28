@@ -879,10 +879,10 @@ Wire Notes Line
 Text Notes 9400 2900 0    50   ~ 0
 System Memory
 $Comp
-L 74xx:74LS174 U?
+L 74xx:74LS174 U0
 U 1 1 617C7373
 P 15250 7100
-F 0 "U?" H 15250 7981 50  0001 C CNN
+F 0 "U0" H 15000 7650 50  0000 C CNN
 F 1 "74LS174" H 15450 7650 50  0000 C CNN
 F 2 "" H 15250 7100 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS174" H 15250 7100 50  0001 C CNN
@@ -912,10 +912,10 @@ F 3 "" H 15250 6400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U2
 U 5 1 617E86AE
 P 13800 6450
-F 0 "U?" V 13433 6450 50  0001 C CNN
+F 0 "U2" V 13650 6850 50  0000 C CNN
 F 1 "4081" V 13524 6450 50  0001 C CNN
 F 2 "" H 13800 6450 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13800 6450 50  0001 C CNN
@@ -923,10 +923,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	0    -1   -1   0   
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U2
 U 4 1 617E2BC1
 P 13700 7900
-F 0 "U?" H 13700 8225 50  0001 C CNN
+F 0 "U2" H 13450 7900 50  0000 C CNN
 F 1 "4081" H 13700 8134 50  0001 C CNN
 F 2 "" H 13700 7900 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 7900 50  0001 C CNN
@@ -934,10 +934,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U2
 U 3 1 617E1936
 P 13700 7550
-F 0 "U?" H 13700 7875 50  0001 C CNN
+F 0 "U2" H 13450 7550 50  0000 C CNN
 F 1 "4081" H 13700 7784 50  0001 C CNN
 F 2 "" H 13700 7550 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 7550 50  0001 C CNN
@@ -945,10 +945,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U2
 U 2 1 617DFD9C
 P 13700 7200
-F 0 "U?" H 13700 7525 50  0001 C CNN
+F 0 "U2" H 13450 7200 50  0000 C CNN
 F 1 "4081" H 13700 7434 50  0001 C CNN
 F 2 "" H 13700 7200 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 7200 50  0001 C CNN
@@ -956,10 +956,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U2
 U 1 1 617D8F89
 P 13700 6850
-F 0 "U?" H 13700 7175 50  0001 C CNN
+F 0 "U2" H 13450 6850 50  0000 C CNN
 F 1 "4081" H 13700 7084 50  0001 C CNN
 F 2 "" H 13700 6850 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 6850 50  0001 C CNN
@@ -967,10 +967,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U3
 U 1 1 61830A0B
 P 13700 8250
-F 0 "U?" H 13700 8575 50  0001 C CNN
+F 0 "U3" H 13450 8250 50  0000 C CNN
 F 1 "4081" H 13700 8484 50  0001 C CNN
 F 2 "" H 13700 8250 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 8250 50  0001 C CNN
@@ -978,10 +978,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U3
 U 2 1 61832086
 P 13700 8600
-F 0 "U?" H 13700 8925 50  0001 C CNN
+F 0 "U3" H 13450 8600 50  0000 C CNN
 F 1 "4081" H 13700 8834 50  0001 C CNN
 F 2 "" H 13700 8600 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 8600 50  0001 C CNN
@@ -989,10 +989,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U3
 U 3 1 6183366C
 P 13700 8950
-F 0 "U?" H 13700 9275 50  0001 C CNN
+F 0 "U3" H 13450 8950 50  0000 C CNN
 F 1 "4081" H 13700 9184 50  0001 C CNN
 F 2 "" H 13700 8950 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 8950 50  0001 C CNN
@@ -1000,10 +1000,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U3
 U 4 1 61834DB5
 P 13700 9300
-F 0 "U?" H 13700 9625 50  0001 C CNN
+F 0 "U3" H 13450 9300 50  0000 C CNN
 F 1 "4081" H 13700 9534 50  0001 C CNN
 F 2 "" H 13700 9300 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13700 9300 50  0001 C CNN
@@ -1011,10 +1011,10 @@ F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms
 	1    0    0    -1  
 $EndComp
 $Comp
-L z80-rescue:4081-4xxx U?
+L z80-rescue:4081-4xxx U3
 U 5 1 6183680D
 P 13800 9700
-F 0 "U?" V 13433 9700 50  0001 C CNN
+F 0 "U3" V 13950 10100 50  0000 C CNN
 F 1 "4081" V 13524 9700 50  0001 C CNN
 F 2 "" H 13800 9700 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf" H 13800 9700 50  0001 C CNN
@@ -1066,10 +1066,10 @@ F 3 "" H 14300 9700 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L 74xx:74LS174 U?
+L 74xx:74LS174 U1
 U 1 1 6187FAE0
 P 15250 8950
-F 0 "U?" H 15250 9831 50  0001 C CNN
+F 0 "U1" H 15000 9500 50  0000 C CNN
 F 1 "74LS174" H 15450 9500 50  0000 C CNN
 F 2 "" H 15250 8950 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS174" H 15250 8950 50  0001 C CNN
@@ -1299,10 +1299,10 @@ A1
 Text GLabel 12250 8350 1    50   Input ~ 0
 A0
 $Comp
-L 74xGxx:74AUC2G32 U?
+L 74xGxx:74AUC2G32 U5
 U 1 1 61B34189
 P 12250 9200
-F 0 "U?" H 12200 9500 50  0001 C CNN
+F 0 "U5" V 12150 9400 50  0001 C CNN
 F 1 "74AUC2G32" H 12225 9376 50  0001 C CNN
 F 2 "" H 12250 9200 50  0001 C CNN
 F 3 "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf" H 12250 9200 50  0001 C CNN
@@ -1310,10 +1310,10 @@ F 3 "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf" H 12250 9200 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L z80-rescue:4069-4xxx U?
+L z80-rescue:4069-4xxx U4
 U 1 1 61B37C38
 P 12550 9450
-F 0 "U?" H 12550 9133 50  0001 C CNN
+F 0 "U4" H 12650 9550 50  0000 C CNN
 F 1 "4069" H 12550 9224 50  0001 C CNN
 F 2 "" H 12550 9450 50  0001 C CNN
 F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4069ubms.pdf" H 12550 9450 50  0001 C CNN
@@ -1323,10 +1323,10 @@ $EndComp
 Text GLabel 12200 8900 0    50   Input ~ 0
 IOReq
 $Comp
-L 74xx:74HC595 U?
+L 74xx:74HC595 U0
 U 1 1 61730099
 P 3400 8100
-F 0 "U?" H 3400 8881 50  0001 C CNN
+F 0 "U0" H 3150 8650 50  0000 C CNN
 F 1 "74HC595" H 3400 8790 50  0001 C CNN
 F 2 "" H 3400 8100 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf" H 3400 8100 50  0001 C CNN
@@ -1384,10 +1384,10 @@ F 3 "" H 3400 9350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L promicro:Sparkfun_Pro_Micro A?
+L promicro:Sparkfun_Pro_Micro A0
 U 1 1 6173E89B
 P 1250 8950
-F 0 "A?" H 1250 10131 50  0001 C CNN
+F 0 "A0" H 1050 7800 50  0000 C CNN
 F 1 "32U4 Arduino" H 850 7900 50  0000 C CNN
 F 2 "Module:Arduino_UNO_R3" H 1250 8950 50  0001 C CIN
 F 3 "https://www.arduino.cc/en/Main/ArduinoBoardLeonardo" H 1250 8950 50  0001 C CNN
@@ -1406,7 +1406,7 @@ F 3 "" H 1450 10050 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	2750 8250 2600 7700
+	2600 8250 2600 7700
 Wire Wire Line
 	2600 7700 3000 7700
 Wire Wire Line
@@ -1452,7 +1452,7 @@ Wire Wire Line
 	2550 10050 2550 8450
 Connection ~ 2550 8450
 Wire Wire Line
-	1750 8250 2750 8250
+	1750 8250 2600 8250
 Wire Wire Line
 	1750 8350 2650 8350
 Wire Wire Line
@@ -2230,10 +2230,10 @@ $EndComp
 Text GLabel 2900 10950 3    50   Input ~ 0
 RD
 $Comp
-L 74xx:74HC595 U?
+L 74xx:74HC595 U1
 U 1 1 617346A3
 P 3400 9950
-F 0 "U?" H 3400 10731 50  0001 C CNN
+F 0 "U1" H 3150 10500 50  0000 C CNN
 F 1 "74HC595" H 3400 10640 50  0001 C CNN
 F 2 "" H 3400 9950 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf" H 3400 9950 50  0001 C CNN
@@ -2399,5 +2399,71 @@ F 2 "" H 1650 7700 50  0001 C CNN
 F 3 "" H 1650 7700 50  0001 C CNN
 	1    1650 7700
 	0    -1   -1   0   
+$EndComp
+$Comp
+L 74xx:74LS174 U?
+U 1 1 619D0860
+P 9700 6800
+F 0 "U?" H 9700 7681 50  0001 C CNN
+F 1 "74LS174" H 9900 7350 50  0000 C CNN
+F 2 "" H 9700 6800 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS174" H 9700 6800 50  0001 C CNN
+	1    9700 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L z80-rescue:4069-4xxx U?
+U 1 1 619D223C
+P 10050 8100
+F 0 "U?" H 10050 7783 50  0001 C CNN
+F 1 "4069" H 10050 7874 50  0001 C CNN
+F 2 "" H 10050 8100 50  0001 C CNN
+F 3 "http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4069ubms.pdf" H 10050 8100 50  0001 C CNN
+	1    10050 8100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 619D27CF
+P 9700 6100
+F 0 "#PWR?" H 9700 5950 50  0001 C CNN
+F 1 "+5V" H 9600 6100 50  0000 C CNN
+F 2 "" H 9700 6100 50  0001 C CNN
+F 3 "" H 9700 6100 50  0001 C CNN
+	1    9700 6100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 619D2CF2
+P 9700 7600
+F 0 "#PWR?" H 9700 7350 50  0001 C CNN
+F 1 "GND" H 9800 7600 50  0000 C CNN
+F 2 "" H 9700 7600 50  0001 C CNN
+F 3 "" H 9700 7600 50  0001 C CNN
+	1    9700 7600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Memory_Flash:SST39SF040 U0
+U 1 1 619D51EE
+P 14400 2400
+F 0 "U0" H 14750 3700 50  0000 C CNN
+F 1 "SST39SF040" H 14100 3700 50  0000 C CNN
+F 2 "" H 14400 2700 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/25022B.pdf" H 14400 2700 50  0001 C CNN
+	1    14400 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS174 U?
+U 1 1 619DA82A
+P 12450 3550
+F 0 "U?" H 12450 4431 50  0001 C CNN
+F 1 "74LS174" H 12650 4100 50  0000 C CNN
+F 2 "" H 12450 3550 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS174" H 12450 3550 50  0001 C CNN
+	1    12450 3550
+	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
