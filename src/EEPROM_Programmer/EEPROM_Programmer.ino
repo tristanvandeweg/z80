@@ -27,7 +27,7 @@ byte Read(int address) {
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, INPUT);
   }
-  setAddress(address, /*outputEnable*/ true);
+  setAddress(address, true);
   delayMicroseconds(1);
   byte data = 0;
   for (int pin = EEPROM_D7; pin >= EEPROM_D0; pin -= 1) {
@@ -41,7 +41,7 @@ byte Read(int address) {
    Write a byte to the EEPROM at the specified address.
 */
 void Write(int _address, byte data) {
-  setAddress(_address, /*outputEnable*/ false);
+  setAddress(_address, false);
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, OUTPUT);
   }
@@ -85,9 +85,6 @@ void setup() {
   digitalWrite(WRITE_EN, HIGH);
   pinMode(WRITE_EN, OUTPUT);
   Serial.begin(19200);
-
-  //Serial.println("Reading EEPROM");
-  //printContents();
 }
 
 byte serialData[3];
