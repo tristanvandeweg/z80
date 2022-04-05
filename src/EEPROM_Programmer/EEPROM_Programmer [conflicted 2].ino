@@ -16,6 +16,10 @@ void setAddress(int _addr, bool readEN) {
   digitalWrite(SHIFT_RCLK, LOW);
 }
 
+
+/*
+   Read a byte from the EEPROM at the specified address.
+*/
 byte Read(int _addr) {
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, INPUT);
@@ -29,8 +33,12 @@ byte Read(int _addr) {
   return data;
 }
 
+
+/*
+   Write a byte to the EEPROM at the specified address.
+*/
 void Write(int _addr, byte data) {
-  setAddress(_addr, false);
+  setAddress(_address, false);
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, OUTPUT);
   }
@@ -45,6 +53,10 @@ void Write(int _addr, byte data) {
   delay(10);
 }
 
+
+/*
+   Read the contents of the EEPROM and print them to the serial monitor.
+*/
 void printContents() {
   for (int base = 0; base <= 255; base += 16) {
     byte data[16];
@@ -61,18 +73,6 @@ void printContents() {
   }
 }
 
-void blockWrite(uint16_t _numBytes) {
-  uint16_t n = 0;
-  uint8_t dataLength;
-  byte _serialData[3];
-  while (n < _numBytes) {
-    if (Serial.available() > 0) {
-      dataLength = Serial.readBytes(_serialData, 3);
-    }
-  }
-  
-}
-
 void setup() {
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_SRCLK, OUTPUT);
@@ -81,7 +81,7 @@ void setup() {
   pinMode(READ_EN, OUTPUT);
   digitalWrite(WRITE_EN, HIGH);
   pinMode(WRITE_EN, OUTPUT);
-  Serial.begin(115200);
+  Serial.begin(19200);
 }
 
 byte serialData[3];
@@ -89,7 +89,6 @@ uint8_t dataLength;
 uint8_t serialMode = 0;
 uint16_t address = 0;
 uint8_t writeData = 0;
-uint16_t numBytes = 0;
 
 void loop() {
   if (Serial.available() > 0) {
@@ -121,15 +120,6 @@ void loop() {
           serialMode = 0;
         }
         break;
-      case 3:
-        if(numBytes == 0 && serialData[0] == 'B') {
-          if(dataLength > 1) {
-            numBytes = serialData[1] << 8 | serialData[2];
-            blockWrite(numBytes);
-            numBytes = 0;
-          }
-        }
-        break;
       default:
         address = 0;
         writeData = 0;
@@ -141,10 +131,6 @@ void loop() {
           case 'w':
             serialMode = 2;
             Serial.println("w Writing to EEPROM");
-            break;
-          case 'b':
-            serialMode = 3;
-            Serial.println("b Block writing to EEPROM");
             break;
           case 'R':
           default:
