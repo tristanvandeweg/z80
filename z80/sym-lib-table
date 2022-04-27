@@ -1,6 +1,7 @@
 (sym_lib_table
-  (lib (name PEEPROM)(type Legacy)(uri /home/tristan/pCloudDrive/z80/KiCAD/2021-10-14_17-07-37/2021-10-14_17-07-37.lib)(options "")(descr ""))
-  (lib (name SN74AC32)(type Legacy)(uri /home/tristan/pCloudDrive/z80/KiCAD/or/2021-10-17_12-04-32.lib)(options "")(descr ""))
-  (lib (name z80-rescue)(type Legacy)(uri ${KIPRJMOD}/z80-rescue.lib)(options "")(descr ""))
-  (lib (name promicro)(type Legacy)(uri /home/tristan/Documents/z80/KiCAD/MCU_Module.lib)(options "")(descr ""))
+  (lib (name "PEEPROM")(type "Legacy")(uri "/home/tristan/pCloudDrive/z80/KiCAD/2021-10-14_17-07-37/2021-10-14_17-07-37.lib")(options "")(descr ""))
+  (lib (name "SN74AC32")(type "Legacy")(uri "/home/tristan/pCloudDrive/z80/KiCAD/or/2021-10-17_12-04-32.lib")(options "")(descr ""))
+  (lib (name "z80-rescue")(type "Legacy")(uri "${KIPRJMOD}/z80-rescue.lib")(options "")(descr ""))
+  (lib (name "promicro")(type "Legacy")(uri "/home/tristan/Documents/z80/KiCAD/MCU_Module.lib")(options "")(descr ""))
+  (lib (name "atf16v8bql")(type "Legacy")(uri "/home/tristan/Documents/z80/KiCAD/ul_ATF16V8BQL-15PU/KiCAD/2022-04-27_16-56-51/2022-04-27_16-56-51.lib")(options "")(descr "Atmel EEPLD"))
 )

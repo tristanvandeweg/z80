@@ -61,8 +61,8 @@ void printContents() {
   }
 }
 
-void blockWrite(uint16_t _numBytes) {
-  uint16_t n = 0;
+void blockWrite(uint32_t _numBytes) {
+  uint32_t n = 0;
   uint8_t dataLength;
   byte _serialData[3];
   while (n < _numBytes) {
