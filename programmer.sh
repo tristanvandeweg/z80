@@ -10,7 +10,7 @@ if [[ "$((${python_version_arr[0]}))" == 3 ]] ; then
 	if [[ "$((${python_version_arr[1]}))" -gt 9 ]] ; then
 		IFS=''
 		script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && (pwd -W 2> /dev/null || pwd))
-		script_dir="${script_dir}/src/ProgrammerInterface/ProgrammerUI.py"
+		script_dir="${script_dir}/src/ProgrammerInterface/programmer.py"
 		echo $script_dir
 		python $script_dir
 	fi

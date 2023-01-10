@@ -48,7 +48,7 @@ def writeByte(_addr1, _addr2, _data):
 def read():
     ser.write(bytearray(b'\x52\x0D\x0A'))
     #sleep(1)
-    o = ser.read(1000)
+    o = ser.read(27500)
     #with redirect_stdout(StringIO()) as f:
     print(o.decode("ascii"))
     #rd = f.getvalue()

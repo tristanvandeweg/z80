@@ -1,3 +1,10 @@
+#define EEPROM_SIZE 8192
+/*
+ * EEPROM Sizes:
+ * 2KB  2048
+ * 4KB  4096
+ * 8KB  8192
+ */
 #define SHIFT_DATA 15
 #define SHIFT_SRCLK 14
 #define SHIFT_RCLK 16
@@ -45,15 +52,18 @@ void Write(int _addr, byte data) {
   delay(10);
 }
 
-void printContents() {
-  for (int base = 0; base <= 255; base += 16) {
+void printContents(int _nBytes) {
+  if(_nBytes == 0){
+    _nBytes = EEPROM_SIZE;
+  }
+  for (int base = 0; base <= _nBytes - 1; base += 16) {
     byte data[16];
     for (int offset = 0; offset <= 15; offset += 1) {
       data[offset] = Read(base + offset);
     }
 
     char buf[80];
-    sprintf(buf, "%03x:  %02x %02x %02x %02x %02x %02x %02x %02x   %02x %02x %02x %02x %02x %02x %02x %02x",
+    sprintf(buf, "%04x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x",
             base, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7],
             data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
 
@@ -150,7 +160,7 @@ void loop() {
           default:
             serialMode = 0;
             Serial.println("R Printing EEPROM Contents");
-            printContents();
+            printContents(0);
             break;
         }
         break;
