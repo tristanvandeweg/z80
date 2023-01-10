@@ -111,11 +111,11 @@ class Main(wx.Frame):
 		CurSerialSettings = wx.BoxSizer(wx.VERTICAL)
 		sizer_2.Add(CurSerialSettings, 2, wx.ALIGN_CENTER_VERTICAL, 0)
 
-		CurSerialPort = wx.StaticText(self.panel_1, wx.ID_ANY, "Serial Port")
-		CurSerialSettings.Add(CurSerialPort, 0, wx.EXPAND, 0)
+		self.CurSerialPort = wx.StaticText(self.panel_1, wx.ID_ANY, "Serial Port")
+		CurSerialSettings.Add(self.CurSerialPort, 0, wx.EXPAND, 0)
 
-		CurSerialBaud = wx.StaticText(self.panel_1, wx.ID_ANY, "Baudrate")
-		CurSerialSettings.Add(CurSerialBaud, 0, wx.EXPAND, 0)
+		self.CurSerialBaud = wx.StaticText(self.panel_1, wx.ID_ANY, "Baudrate")
+		CurSerialSettings.Add(self.CurSerialBaud, 0, wx.EXPAND, 0)
 
 		self.SetSerialSettings = wx.Button(self.panel_1, wx.ID_ANY, "Settings")
 		sizer_2.Add(self.SetSerialSettings, 1, wx.ALIGN_CENTER_VERTICAL, 0)

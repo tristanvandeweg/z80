@@ -24,7 +24,7 @@ serialPort = ""
 
 class MainUI(ProgrammerUI.Main):
     def __init__(self, *args, **kwds):
-        self.UI = ProgrammerUI.Main.__init__(self, *args, **kwds)
+        ProgrammerUI.Main.__init__(self, *args, **kwds)
     
     def OnFileSelect(self, event):
         filename = ""
@@ -48,22 +48,27 @@ class MainUI(ProgrammerUI.Main):
     def OnSerialPortSettings(self, event):
         self.SerialSelect = SerialSelectUI(None, wx.ID_ANY, "")
         self.SerialSelect.Show()
-        if connected:
-            self.UI.CurSerialBaud.SetLabel(serialBaud)
-            self.UI.CurSerialPort.SetLabel(serialPort)
-            self.Read.Enable(True)
 
 class SerialSelectUI(ProgrammerUI.SerialSelect):
     def __init__(self, *args, **kwds):
         ProgrammerUI.SerialSelect.__init__(self, *args, **kwds)
 
     def OnSerialConnect(self, event):
-        #binprog.connectSerial(self.SerialPort.GetLineText(0), self.SerialBaudRate.GetStringSelection())
+        #binprog.connectSerial(self.SerialPort.GetLineText(0), int(self.SerialBaudRate.GetStringSelection()))
         if True: #binprog.ser.is_open
-            serialBaud = self.SerialBaudRate.GetLabelText()
+            global serialBaud
+            global serialPort
+            global connected
+            serialBaud = self.SerialBaudRate.GetStringSelection()
             serialPort = self.SerialPort.GetLineText(0)
             connected = True
+
+            if connected:
+                ProgrammerInterface.frame.CurSerialBaud.SetLabel(serialBaud)
+                ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
+                ProgrammerInterface.frame.Read.Enable(True)
             self.Destroy()
+
 
 class UI(wx.App):
     def OnInit(self):
