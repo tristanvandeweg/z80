@@ -17,6 +17,7 @@
 import binprog
 import ProgrammerUI
 import wx
+import sys
 
 connected = False
 serialBaud = 0
@@ -27,18 +28,20 @@ class MainUI(ProgrammerUI.Main):
         ProgrammerUI.Main.__init__(self, *args, **kwds)
     
     def OnFileSelect(self, event):
+        global filename
         filename = ""
         dlg = wx.FileDialog(self, message="Choose Binary")
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             dlg.Destroy()
         if filename:
-            self.SelectedFile.SetLabel(filename)
-            if binprog.ser.is_open:
+            ProgrammerInterface.frame.SelectedFile.SetLabel(filename)
+            if connected:
                 self.Write.Enable(True)
     
     def OnWrite(self, event):
         print("Event handler 'OnWrite' not implemented!")
+        print(binprog.readFile(filename))
         event.Skip()
 
     def OnRead(self, event):
@@ -67,6 +70,8 @@ class SerialSelectUI(ProgrammerUI.SerialSelect):
                 ProgrammerInterface.frame.CurSerialBaud.SetLabel(serialBaud)
                 ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
                 ProgrammerInterface.frame.Read.Enable(True)
+                if filename:
+                    ProgrammerInterface.frame.Write.Enable(True)
             self.Destroy()
 
 

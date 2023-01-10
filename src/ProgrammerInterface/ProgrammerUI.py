@@ -91,8 +91,8 @@ class Main(wx.Frame):
 		self.FileSelect = wx.Button(self.panel_1, wx.ID_ANY, "Select File")
 		sizerFileSelect.Add(self.FileSelect, 0, wx.ALIGN_CENTER_VERTICAL, 0)
 
-		SelectedFile = wx.StaticText(self.panel_1, wx.ID_ANY, "Selected File")
-		sizerFileSelect.Add(SelectedFile, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 7)
+		self.SelectedFile = wx.StaticText(self.panel_1, wx.ID_ANY, "Selected File")
+		sizerFileSelect.Add(self.SelectedFile, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 7)
 
 		ProgrammingControls = wx.StaticBoxSizer(wx.StaticBox(self.panel_1, wx.ID_ANY, "Programming"), wx.HORIZONTAL)
 		sizer_1.Add(ProgrammingControls, 1, wx.EXPAND, 0)
