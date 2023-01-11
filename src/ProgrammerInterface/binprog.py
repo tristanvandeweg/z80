@@ -40,7 +40,7 @@ def writeByte(_addr1, _addr2, _data):
     sleep(.5)
     ser.write(bytearray([b'\x41', _addr1, _addr2, b'\x0D\x0A']))
     sleep(.5)
-    ser.wire(bytearray([b'\x44', _data, b'\x0D\x0A']))
+    ser.write(bytearray([b'\x44', _data, b'\x0D\x0A']))
     sleep(.5)
     ser.write(bytearray(b'\x57\x0D\x0A'))
     sleep(.5)
@@ -53,6 +53,10 @@ def read():
     print(o.decode("ascii"))
     #rd = f.getvalue()
     return o.decode("ascii")
+
+def readFile(_filename):
+    with open(_filename, mode="rb") as file:
+        return file.read()
 
 if __name__=='__main__':
     sys.exit()

@@ -17,6 +17,7 @@
 import binprog
 import ProgrammerUI
 import wx
+import sys
 
 connected = False
 serialBaud = 0
@@ -24,21 +25,23 @@ serialPort = ""
 
 class MainUI(ProgrammerUI.Main):
     def __init__(self, *args, **kwds):
-        self.UI = ProgrammerUI.Main.__init__(self, *args, **kwds)
+        ProgrammerUI.Main.__init__(self, *args, **kwds)
     
     def OnFileSelect(self, event):
+        global filename
         filename = ""
         dlg = wx.FileDialog(self, message="Choose Binary")
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             dlg.Destroy()
         if filename:
-            self.SelectedFile.SetLabel(filename)
-            if binprog.ser.is_open:
+            ProgrammerInterface.frame.SelectedFile.SetLabel(filename)
+            if connected:
                 self.Write.Enable(True)
     
     def OnWrite(self, event):
         print("Event handler 'OnWrite' not implemented!")
+        print(binprog.readFile(filename))
         event.Skip()
 
     def OnRead(self, event):
@@ -48,22 +51,29 @@ class MainUI(ProgrammerUI.Main):
     def OnSerialPortSettings(self, event):
         self.SerialSelect = SerialSelectUI(None, wx.ID_ANY, "")
         self.SerialSelect.Show()
-        if connected:
-            self.UI.CurSerialBaud.SetLabel(serialBaud)
-            self.UI.CurSerialPort.SetLabel(serialPort)
-            self.Read.Enable(True)
 
 class SerialSelectUI(ProgrammerUI.SerialSelect):
     def __init__(self, *args, **kwds):
         ProgrammerUI.SerialSelect.__init__(self, *args, **kwds)
 
     def OnSerialConnect(self, event):
-        #binprog.connectSerial(self.SerialPort.GetLineText(0), self.SerialBaudRate.GetStringSelection())
+        #binprog.connectSerial(self.SerialPort.GetLineText(0), int(self.SerialBaudRate.GetStringSelection()))
         if True: #binprog.ser.is_open
-            serialBaud = self.SerialBaudRate.GetLabelText()
+            global serialBaud
+            global serialPort
+            global connected
+            serialBaud = self.SerialBaudRate.GetStringSelection()
             serialPort = self.SerialPort.GetLineText(0)
             connected = True
+
+            if connected:
+                ProgrammerInterface.frame.CurSerialBaud.SetLabel(serialBaud)
+                ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
+                ProgrammerInterface.frame.Read.Enable(True)
+                if filename:
+                    ProgrammerInterface.frame.Write.Enable(True)
             self.Destroy()
+
 
 class UI(wx.App):
     def OnInit(self):
