@@ -92,7 +92,6 @@ class SerialSelectUI(ProgrammerUI.SerialSelect):
             if self.checkbox.GetValue():
                 config.set("connection", "port", serialPort)
                 config.set("connection", "baudrate", serialBaud)
-            if self.checkbox.GetValue():
                 config.set("connection", "save", "true")
             else:
                 config.set("connection", "save", "false")
@@ -120,6 +119,11 @@ class LicenceUI(ProgrammerUI.Licence):
     def OnLicenceAgree(self, event):
         if self.NoLicence.GetValue:
             config.set("licence", "hide", "true")
+
+            with open(configPath, "w") as configFile:
+                config.write(configFile)
+                configFile.flush()
+                configFile.close()
         self.Destroy()
 
 
@@ -134,4 +138,12 @@ class UI(wx.App):
 
 if __name__ == "__main__":
     ProgrammerInterface = UI(0)
+    #binprog.connectSerial(config["connection"]["port"],config["connection"]["baudrate"])
+    if True: #binprog.serConnected:
+        connected = True
+        serialBaud = config["connection"]["baudrate"]
+        serialPort = config["connection"]["port"]
+        ProgrammerInterface.frame.CurSerialBaud.SetLabel(str(serialBaud))
+        ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
+        ProgrammerInterface.frame.Read.Enable(True)
     ProgrammerInterface.MainLoop()
