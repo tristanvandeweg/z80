@@ -1,0 +1,27 @@
+ 
+stack
+help
+quit
+help
+x
+reg
+next
+help
+cont
+reg
+help reg
+help
+quit
+re
+reg
+next
+help
+reg
+quit
+reg
+help
+stack
+quit
+reg
+exit
+quit

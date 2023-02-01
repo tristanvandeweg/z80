@@ -3075,9 +3075,12 @@
     )
   )
 
-  (bus_alias "Address" (members ))
   (bus_alias "Data" (members ))
+  (bus_alias "Address" (members ))
 
+  (junction (at 174.625 166.37) (diameter 0) (color 0 0 0 0)
+    (uuid 005d7d91-7821-441c-8f14-ad90eb4edf83)
+  )
   (junction (at 237.49 203.2) (diameter 0) (color 0 0 0 0)
     (uuid 0cf6bd8a-f10a-4c78-a860-b5c391d1ea00)
   )
@@ -4525,6 +4528,11 @@
   (bus (pts (xy 128.905 36.195) (xy 128.905 38.735))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 3ad70892-b12d-446a-82e8-50ec29bc6a68)
+  )
+
+  (wire (pts (xy 174.625 163.83) (xy 174.625 166.37))
+    (stroke (width 0) (type default) (color 0 0 0 0))
+    (uuid 3b1406b7-6081-49ca-b2a9-3f1a0924752d)
   )
   (bus (pts (xy 142.24 97.155) (xy 142.24 99.695))
     (stroke (width 0) (type default) (color 0 0 0 0))
@@ -6001,7 +6009,7 @@
     (uuid ee1f4ba6-5c1d-4311-b1bd-5a23b178029c)
   )
 
-  (wire (pts (xy 174.625 163.83) (xy 184.15 163.83))
+  (wire (pts (xy 174.625 161.29) (xy 184.15 161.29))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid ee673473-aa54-4945-8a77-07a502caf3bd)
   )
@@ -6483,7 +6491,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 773f21de-3f7b-4645-808d-19a20a85b95b)
   )
-  (label "RAM1-CS" (at 184.15 163.83 180)
+  (label "RAM1-CS" (at 184.15 161.29 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 7848375d-5003-4c6c-bf56-5cb99fb1a1fe)
   )
