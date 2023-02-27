@@ -6,8 +6,8 @@
 
   (title_block
     (title "z80 Flash Cartridge")
-    (date "2022-11-06")
-    (rev "1.6")
+    (date "2023-02-27")
+    (rev "1.7")
     (company "T. van de Weg")
   )
 
@@ -593,6 +593,7 @@
       )
     )
   )
+
 
   (junction (at 85.09 121.285) (diameter 0) (color 0 0 0 0)
     (uuid 47fb09ab-ee7b-46f6-b677-f78095319d76)
@@ -1515,7 +1516,7 @@
   (symbol (lib_id "Device:R_Small") (at 90.17 95.885 270) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 7e8136b8-bdbd-45dc-b59b-4dde78875e8f)
-    (property "Reference" "R?" (id 0) (at 90.17 100.8634 90)
+    (property "Reference" "R37" (id 0) (at 90.17 100.8634 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "1K" (id 1) (at 90.17 98.552 90))
@@ -1532,7 +1533,7 @@
   (symbol (lib_id "74xx:74LS174") (at 72.39 93.345 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 7ff1c869-56e9-4d57-a98b-35e741f3578f)
-    (property "Reference" "U?" (id 0) (at 66.04 79.375 0))
+    (property "Reference" "U8" (id 0) (at 66.04 79.375 0))
     (property "Value" "74LS174" (id 1) (at 77.47 79.375 0))
     (property "Footprint" "Package_SO:SO-16_5.3x10.2mm_P1.27mm" (id 2) (at 72.39 93.345 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -1561,7 +1562,7 @@
   (symbol (lib_id "Device:R_Small") (at 59.69 108.585 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 9f57491f-0f23-49b3-bc57-c9321d5dc94d)
-    (property "Reference" "R?" (id 0) (at 64.6684 108.585 90)
+    (property "Reference" "R36" (id 0) (at 64.6684 108.585 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "1K" (id 1) (at 60.96 108.585 90)
@@ -1580,7 +1581,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x16_Counter_Clockwise") (at 105.41 126.365 270) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid bd8216a5-d4a6-4aa4-8640-0da20c4478d1)
-    (property "Reference" "J?" (id 0) (at 82.8802 126.4666 90)
+    (property "Reference" "J3" (id 0) (at 82.8802 126.4666 90)
       (effects (font (size 1.27 1.27)) (justify right) hide)
     )
     (property "Value" "Conn_02x16_Counter_Clockwise" (id 1) (at 82.8802 128.778 90)
@@ -1629,7 +1630,7 @@
   (symbol (lib_id "Memory_Flash:SST39SF040") (at 107.95 75.565 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid f5540203-814d-48f2-b503-839e8c6f8b61)
-    (property "Reference" "U?" (id 0) (at 116.84 42.545 0))
+    (property "Reference" "U9" (id 0) (at 116.84 42.545 0))
     (property "Value" "SST39SF040" (id 1) (at 100.33 42.545 0))
     (property "Footprint" "Package_DIP:DIP-32_W15.24mm_Socket" (id 2) (at 107.95 67.945 0)
       (effects (font (size 1.27 1.27)) hide)

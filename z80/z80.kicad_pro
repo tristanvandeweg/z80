@@ -137,11 +137,7 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [
-      "lib_symbol_issues|317500|1549400|909e466e-99e6-448e-84e3-53ec77ac9f7c|00000000-0000-0000-0000-000000000000",
-      "pin_to_pin|749300|1016000|9081d63d-e058-40c8-aa77-b7f314a599db|6f8256e6-5dfc-4cdc-9d77-818253414954",
-      "pin_to_pin|749300|1104900|6f8256e6-5dfc-4cdc-9d77-818253414954|6654ac8e-8fcc-43eb-ae73-37be136e0b7e"
-    ],
+    "erc_exclusions": [],
     "meta": {
       "version": 0
     },
@@ -334,9 +330,9 @@
       "net_not_bus_member": "warning",
       "no_connect_connected": "warning",
       "no_connect_dangling": "warning",
-      "pin_not_connected": "error",
+      "pin_not_connected": "warning",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "unannotated": "error",
