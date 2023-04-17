@@ -1,0 +1,46 @@
+;OS for boot ROM with bootcode and romcalls
+;Copyright (C) 2023  Tristan van de Weg & Marijn Vollenberg
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License along
+;    with this program; if not, write to the Free Software Foundation, Inc.,
+;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+.equ OSfile, 1
+.include "z80.inc"
+
+Boot:
+	ld hl,_StackTop			;Set stack pointer to correct place in RAM	TODO fix location
+	ld sp,hl				;
+	ld a,(_ExtMem)			;Check for program start byte
+	cp a,$69				;
+	jp z,_ExtMem+1			;Jump to program if there is one
+	ld hl,strBootError		;Print Error message if there is no program
+	call _Print				;
+Stop:
+	nop
+	jp Stop
+
+strBootError:
+	.byte "No valid program found",0
+
+;--------------------------------
+;ROMCalls
+;--------------------------------
+.align $0040
+_Print:						;Address of string to print in hl
+
+_ClrScrn:					;Clear the LCD
+	ld a,%00000000
+	out _DisplayCmd,a
+	ld a,%00000001
+	out _Display,a
+	

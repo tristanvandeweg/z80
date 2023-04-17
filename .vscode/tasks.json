@@ -1,0 +1,32 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "z80 C compile",
+            "type": "shell",
+            "command": "/bin/docker run -v ${fileDirname}:${fileDirname} -it z88dk/z88dk zcc +z80 -vn -O3 -clib=new ${file} -o ${file}.out -create-app",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "z80 Assemble",
+            "type": "shell",
+            "linux":{
+                "command": "${workspaceFolder}/tools/vasmz80_std ${file} -o ${fileDirname}/bin/${fileBasenameNoExtension}.bin"
+            },
+            "windows":{
+                "command": "${workspaceFolder}\\tools\\vasmz80_std.exe ${file} -o ${fileDirname}\\bin\\${fileBasenameNoExtension}.bin"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

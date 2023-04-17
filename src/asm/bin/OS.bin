@@ -1,0 +1,34 @@
+Sections:
+section .text (attr=<acrx> align=1):
+       0: symbol: Boot LAB (0x0) UNUSED sec=.text 
+       0: data(3): 21 00 00 rabs(1,0-15,0xffff,0x0,$3fff IMP REF ) 
+       3: data(1): f9 
+       4: data(3): 3a 00 00 rabs(1,0-15,0xffff,0x0,$4000 IMP REF ) 
+       7: data(2): fe 00 rabs(1,0-7,0xffff,0x0,$69 IMP REF ) 
+       9: data(3): ca 01 00 rabs(1,0-15,0xffff,0x1,$4000 IMP REF ) 
+       c: data(3): 21 16 00 rabs(1,0-15,0xffff,0x16,strBootError LAB (0x16) REF sec=.text ) 
+       f: data(3): cd 2d 00 rabs(1,0-15,0xffff,0x2d,_Print LAB (0x2d) REF sec=.text ) 
+      12: symbol: Stop LAB (0x12) REF sec=.text 
+      12: data(1): 00 
+      13: data(3): c3 12 00 rabs(1,0-15,0xffff,0x12,Stop LAB (0x12) REF sec=.text ) 
+      16: symbol: strBootError LAB (0x16) REF sec=.text 
+      16: data(22): 4e 6f 20 76 61 6c 69 64 20 70 72 6f 67 72 61 6d 20 66 6f 75 6e 64 
+      2c: data(1): 00 
+      2d: symbol: _Print LAB (0x2d) REF sec=.text 
+Symbols:
+Stop LAB (0x12) REF sec=.text 
+_Print LAB (0x2d) REF sec=.text 
+strBootError LAB (0x16) REF sec=.text 
+$69 IMP REF 
+Boot LAB (0x0) UNUSED sec=.text 
+_StackTop IMP align=1 
+$3fff IMP REF 
+_StackSize EXPR(255=0xff) UNUSED 
+_ExtMem IMP align=1 
+$4000 IMP REF 
+_ROM EXPR(0=0x0) UNUSED 
+_RAM IMP UNUSED align=1 
+$2000 IMP 
+OSfile EXPR(1=0x1) UNUSED 
+__VASM EXPR(0=0x0) INTERNAL 
+__UNIXFS EXPR(0=0x0) INTERNAL 

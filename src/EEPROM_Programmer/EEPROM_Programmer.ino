@@ -10,8 +10,9 @@
 #define SHIFT_RCLK 16
 #define EEPROM_D0 2
 #define EEPROM_D7 9
-#define WRITE_EN 10
+#define WRITE_EN A1
 #define READ_EN A0
+#define RESET 10
 
 void setAddress(int _addr, bool readEN) {
   shiftOut(SHIFT_DATA, SHIFT_SRCLK, MSBFIRST, (_addr >> 8));
@@ -78,20 +79,31 @@ void blockWrite(uint32_t _numBytes) {
   while (n < _numBytes) {
     if (Serial.available() > 0) {
       dataLength = Serial.readBytes(_serialData, 3);
+      if(_serialData[1] == '\n'){
+        Write(n, _serialData[0]);
+        Serial.println(String("Written") + String(_serialData[0], HEX) + String(" to ") + String(n, HEX));
+        n++;
+      }
     }
   }
   
 }
 
 void setup() {
+  Serial.begin(115200);
+
+  pinMode(RESET, INPUT);
+  while(digitalRead(RESET)){Serial.println("The z80 must be in reset mode");delay(1000);}
+
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_SRCLK, OUTPUT);
   pinMode(SHIFT_RCLK, OUTPUT);
-  digitalWrite(READ_EN, HIGH);
+
   pinMode(READ_EN, OUTPUT);
-  digitalWrite(WRITE_EN, HIGH);
+  digitalWrite(READ_EN, HIGH);
+  
   pinMode(WRITE_EN, OUTPUT);
-  Serial.begin(115200);
+  digitalWrite(WRITE_EN, HIGH);
 }
 
 byte serialData[3];
@@ -135,8 +147,10 @@ void loop() {
         if(numBytes == 0 && serialData[0] == 'B') {
           if(dataLength > 1) {
             numBytes = serialData[1] << 8 | serialData[2];
+            Serial.println(String("Bulk writing ") + String(numBytes) + String("bytes"));
             blockWrite(numBytes);
             numBytes = 0;
+            serialMode = 0;
           }
         }
         break;

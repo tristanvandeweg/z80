@@ -80,8 +80,8 @@ class SerialSelectUI(ProgrammerUI.SerialSelect):
             self.checkbox.SetValue(True)
 
     def OnSerialConnect(self, event):
-        #binprog.connectSerial(self.SerialPort.GetLineText(0), int(self.SerialBaudRate.GetStringSelection()))
-        if True: #binprog.ser.is_open
+        binprog.connectSerial(self.SerialPort.GetLineText(0), 115200)#int(self.SerialBaudRate.GetStringSelection()))
+        if binprog.ser.is_open:
             global serialBaud
             global serialPort
             global connected
