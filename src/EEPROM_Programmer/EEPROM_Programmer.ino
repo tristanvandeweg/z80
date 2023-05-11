@@ -12,24 +12,35 @@
 #define EEPROM_D7 9
 #define WRITE_EN A1
 #define READ_EN A0
-#define RESET 10
+#define ENABLE A2
+#define BUSREQ 10
+#define BUSACK A3
 
-void setAddress(int _addr, bool readEN) {
+void setAddress(int _addr, bool readEN) { // Set an address on the ROM
+  // Check if the address is not out of range
+  if(_addr >= EEPROM_SIZE){_addr = EEPROM_SIZE;}
+  // Set the address in the shift registers
   shiftOut(SHIFT_DATA, SHIFT_SRCLK, MSBFIRST, (_addr >> 8));
   shiftOut(SHIFT_DATA, SHIFT_SRCLK, MSBFIRST, _addr);
+
+  // Set the read enable pin
   digitalWrite(READ_EN, !readEN);
 
+  // Put the shift register content on the output
   digitalWrite(SHIFT_RCLK, LOW);
   digitalWrite(SHIFT_RCLK, HIGH);
   digitalWrite(SHIFT_RCLK, LOW);
 }
 
-byte Read(int _addr) {
+byte Read(int _addr) { // Read a byte from the ROM
+  // Set all the data pins for reading
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, INPUT);
   }
+  // Set the address
   setAddress(_addr, true);
   delayMicroseconds(1);
+  // Read each bit
   byte data = 0;
   for (int pin = EEPROM_D7; pin >= EEPROM_D0; pin -= 1) {
     data = (data << 1) + digitalRead(pin);
@@ -37,23 +48,26 @@ byte Read(int _addr) {
   return data;
 }
 
-void Write(int _addr, byte data) {
+void Write(int _addr, byte data) { // Write a byte to the ROM
+  // Set the address
   setAddress(_addr, false);
+  // Set all data pins for writing
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, OUTPUT);
   }
-
+  // Write each bit
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     digitalWrite(pin, data & 1);
     data = data >> 1;
   }
+  // Write the entire byte
   digitalWrite(WRITE_EN, LOW);
   delayMicroseconds(1);
   digitalWrite(WRITE_EN, HIGH);
   delay(10);
 }
 
-void printContents(int _nBytes) {
+void printContents(int _nBytes) { // Print the entire ROM in a CSV format
   if(_nBytes == 0){
     _nBytes = EEPROM_SIZE;
   }
@@ -72,7 +86,7 @@ void printContents(int _nBytes) {
   }
 }
 
-void blockWrite(uint32_t _numBytes) {
+void blockWrite(uint32_t _numBytes) { // Write multiple bytes sequentially from the start of the ROM
   uint32_t n = 0;
   uint8_t dataLength;
   byte _serialData[3];
@@ -81,7 +95,7 @@ void blockWrite(uint32_t _numBytes) {
       dataLength = Serial.readBytes(_serialData, 3);
       if(_serialData[1] == '\n'){
         Write(n, _serialData[0]);
-        Serial.println(String("Written") + String(_serialData[0], HEX) + String(" to ") + String(n, HEX));
+        Serial.println(String("Written ") + String(_serialData[0], HEX) + String(" to ") + String(n, HEX));
         n++;
       }
     }
@@ -90,20 +104,37 @@ void blockWrite(uint32_t _numBytes) {
 }
 
 void setup() {
+  pinMode(ENABLE, OUTPUT);
+  digitalWrite(ENABLE, HIGH);
+  for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
+    pinMode(pin, INPUT);
+  }
+  
   Serial.begin(115200);
+  while(!Serial){} // Wait for a serial connection
+  // Request usage of the system bus
+  pinMode(BUSACK, INPUT);
+  pinMode(BUSREQ, OUTPUT);
+  digitalWrite(BUSREQ, LOW);
+  delay(100);
+  Serial.print("Waiting for the z80 to enter high-impedance state");
+  while(digitalRead(BUSACK)){Serial.print(".");delay(500);} // wait until z80 is ready
+  Serial.println("");
 
-  pinMode(RESET, INPUT);
-  while(digitalRead(RESET)){Serial.println("The z80 must be in reset mode");delay(1000);}
-
+  // Set up shift register pins
   pinMode(SHIFT_DATA, OUTPUT);
   pinMode(SHIFT_SRCLK, OUTPUT);
   pinMode(SHIFT_RCLK, OUTPUT);
 
+  // Set up enable pins
+  digitalWrite(ENABLE, LOW);
   pinMode(READ_EN, OUTPUT);
   digitalWrite(READ_EN, HIGH);
-  
   pinMode(WRITE_EN, OUTPUT);
   digitalWrite(WRITE_EN, HIGH);
+  
+  Serial.println("For instructions on how to use this tool, see https://github.com/tristanvandeweg/z80/wiki/Programming");
+  Serial.println("Ready.");
 }
 
 byte serialData[3];
@@ -160,20 +191,20 @@ void loop() {
         switch (serialData[0]) {
           case 'r':
             serialMode = 1;
-            Serial.println("r Reading from EEPROM");
+            Serial.println("Reading");
             break;
           case 'w':
             serialMode = 2;
-            Serial.println("w Writing to EEPROM");
+            Serial.println("Writing");
             break;
           case 'b':
             serialMode = 3;
-            Serial.println("b Block writing to EEPROM");
+            Serial.println("Block writing");
             break;
           case 'R':
           default:
             serialMode = 0;
-            Serial.println("R Printing EEPROM Contents");
+            Serial.println("Dumping Contents");
             printContents(0);
             break;
         }

@@ -33,5 +33,6 @@
 ;--------------------------------
 .ifndef OSfile					;Do not define ROMcalls for OS source
 .org $4000
-.equ _Print, $0040				;Address of string to print in hl
+.equ _PrintS, $0040				;Address of string to print in hl, string must end in 0
+.equ _PrintB, $0000				;Byte to print in a TODO fix addressing
 .endif							;End of non-OS ROMcalls

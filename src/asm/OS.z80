@@ -17,30 +17,56 @@
 .equ OSfile, 1
 .include "z80.inc"
 
+;--------------------------------
+;Boot Code
+;--------------------------------
 Boot:
-	ld hl,_StackTop			;Set stack pointer to correct place in RAM	TODO fix location
+	ld hl,_StackTop			;Set stack pointer to correct place in RAM
 	ld sp,hl				;
 	ld a,(_ExtMem)			;Check for program start byte
-	cp a,$69				;
+	cp a,$80				;
 	jp z,_ExtMem+1			;Jump to program if there is one
 	ld hl,strBootError		;Print Error message if there is no program
-	call _Print				;
+	call _PrintS			;
 Stop:
+	ld a,0
+StopLoop:
 	nop
-	jp Stop
+	inc a
+	cp a,$ff
+	jp z,Boot
+	jr StopLoop
+
+_Exit:
+	ld hl,strProgramExit
+	call _PrintS
+	jp Boot
+
+strProgramExit:
+	.byte "Program finished, rebooting",0
 
 strBootError:
 	.byte "No valid program found",0
 
 ;--------------------------------
-;ROMCalls
+;ROM Calls
 ;--------------------------------
-.align $0040
-_Print:						;Address of string to print in hl
+.align $00ff
+_PrintS:						;Address of string to print in hl, string must end in 0
+	ld a,(hl)
+	cp a,0
+	ret z
+	call _PrintB
+`	inc hl
+	jr _PrintS
+
+_PrintB							;Byte to print in a
+	;TODO add printing
+	ret
 
 _ClrScrn:					;Clear the LCD
 	ld a,%00000000
 	out _DisplayCmd,a
 	ld a,%00000001
 	out _Display,a
-	
+	ret

@@ -1,0 +1,27 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model MHS133G04
+#/1306838/1132302/2.50/6/4/Switch
+DEF MHS133G04 S 0 30 Y Y 1 F N
+F0 "S" 750 300 50 H V L CNN
+F1 "MHS133G04" 750 200 50 H V L CNN
+F2 "MHS133G04" 750 100 50 H I L CNN
+F3 "https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=1825255&DocType=Customer+Drawing&DocLang=English&DocFormat=pdf&PartCntxt=1825255-8" 750 0 50 H I L CNN
+F4 "TE CONNECTIVITY / ALCOSWITCH - MHS133G04 - MHS133G04=SP3T SL SW VERT AU 23R8477" 750 -100 50 H I L CNN "Description"
+F5 "12" 750 -200 50 H I L CNN "Height"
+F6 "506-MHS133G04" 750 -300 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/TE-Connectivity-Alcoswitch/MHS133G04?qs=iWbXB9lueyBUmB9gQm6y%2FQ%3D%3D" 750 -400 50 H I L CNN "Mouser Price/Stock"
+F8 "TE Connectivity" 750 -500 50 H I L CNN "Manufacturer_Name"
+F9 "MHS133G04" 750 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X 1 1 0 0 200 R 50 50 0 0 P
+X 2 2 0 -100 200 R 50 50 0 0 P
+X 3 3 0 -200 200 R 50 50 0 0 P
+X 4 4 900 0 200 L 50 50 0 0 P
+X MH1 MH1 900 -100 200 L 50 50 0 0 P
+X MH2 MH2 900 -200 200 L 50 50 0 0 P
+P 5 0 1 6 200 100 700 100 700 -300 200 -300 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library

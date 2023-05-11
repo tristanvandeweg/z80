@@ -57,6 +57,9 @@ def read():
 def readFile(_filename):
     with open(_filename, mode="rb") as file:
         return file.read()
+    
+def bulkWrite(_filename):
+    readFile(_filename) #TODO add this
 
 if __name__=='__main__':
     sys.exit()
