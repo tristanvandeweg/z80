@@ -23,6 +23,8 @@
 Boot:
 	ld hl,_StackTop			;Set stack pointer to correct place in RAM
 	ld sp,hl				;
+	ld a,%10000000			;Set IO1 ports to mode 0 output
+	out ($03),a				;
 	ld a,(_ExtMem)			;Check for program start byte
 	cp a,$80				;
 	jp z,_ExtMem+1			;Jump to program if there is one
@@ -70,3 +72,9 @@ _ClrScrn:					;Clear the LCD
 	ld a,%00000001
 	out _Display,a
 	ret
+
+_EnableLCD:						;DB0-7 on PA of IO1,	CS1,CS2,RST,RW,DI,E on PB of IO1
+	ld a,%00100100
+	out _DisplayCmd,a
+	ld a,%01111100
+	out _Display,a

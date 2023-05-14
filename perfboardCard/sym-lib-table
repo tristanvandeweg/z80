@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Edge_Connector")(type "Legacy")(uri "${KIPRJMOD}/KiCAD/FX27-40S/FX27-40S-0.8SV.lib")(options "")(descr ""))
+)
