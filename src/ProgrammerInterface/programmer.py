@@ -21,92 +21,92 @@ import wx
 import configparser
 from os.path import exists
 
-connected = False
-serialBaud = 0
+serialBaud = 115200
 serialPort = ""
 filename = ""
-configPath = __file__+".cfg"
+configPath = __file__[:-3]+".cfg"
 config = configparser.ConfigParser()
 
-class MainUI(ProgrammerUI.Main):
+class MainUI(ProgrammerUI.Main):                                    #Functionality for the main menu
     def __init__(self, *args, **kwds):
         ProgrammerUI.Main.__init__(self, *args, **kwds)
-        if exists(configPath):
+        if exists(configPath):                                      #Open the config file if it exists
             config.read(configPath)
-        else:
+        else:                                                       #Create a new config file if it doesn't exist
             with open(configPath, "w") as configFile:
                 config.add_section("connection")
                 config.set("connection", "port", "/dev/ttyUSB0")
-                config.set("connection", "baudrate", "19200")
+                config.set("connection", "baudrate", "115200")
                 config.set("connection", "save", "true")
                 config.add_section("licence")
                 config.set("licence", "hide", "false")
                 config.write(configFile)
                 configFile.flush()
                 configFile.close()
-        self.licenceUI = LicenceUI(self, wx.ID_ANY, "")
-    
-    def OnFileSelect(self, event):
+        self.licenceUI = LicenceUI(self, wx.ID_ANY, "")             #Initialize the licence message box
+
+    def OnFileSelect(self, event):                                  #Functionality for the file select button
         global filename
-        dlg = wx.FileDialog(self, message="Choose Binary")
+        dlg = wx.FileDialog(self, message="Choose Binary")          #File selection popup
         if dlg.ShowModal() == wx.ID_OK:
             filename = dlg.GetPath()
             dlg.Destroy()
-        if filename != "":
-            ProgrammerInterface.frame.SelectedFile.SetLabel(filename)
-            if connected:
+        if filename != "":                                          #Set the filename in the menu and enable the write button if connected
+            if len(filename) > 40:
+                ProgrammerInterface.frame.SelectedFile.SetLabel("..."+filename[-40:])
+            else:
+                ProgrammerInterface.frame.SelectedFile.SetLabel(filename)
+            if binprog.serConnected:
                 self.Write.Enable(True)
-    
-    def OnWrite(self, event):
-        # Implement bulk writing
+
+    def OnWrite(self, event):                                       #Functionality for the write button
+        #TODO Implement bulk writing
         print("Event handler 'OnWrite' not implemented!")
         print(binprog.readFile(filename))
         event.Skip()
 
-    def OnRead(self, event):
+    def OnRead(self, event):                                        #Functionality for the read button
         dlg = wx.MessageDialog(self.panel_1, binprog.read(), "EEPROM Contents")
         dlg.ShowModal()
 
-    def OnSerialPortSettings(self, event):
+    def OnSerialPortSettings(self, event):                          #Serial settings menu button
         self.SerialSelect = SerialSelectUI(None, wx.ID_ANY, "")
         self.SerialSelect.Show()
 
-class SerialSelectUI(ProgrammerUI.SerialSelect):
+
+
+class SerialSelectUI(ProgrammerUI.SerialSelect):                    #Functionality for the serial settings menu
     def __init__(self, *args, **kwds):
         ProgrammerUI.SerialSelect.__init__(self, *args, **kwds)
-        if config["connection"]["save"] == "false":
+        if config["connection"]["save"] == "false":                 #Load save config setting for checkbox
             self.checkbox.SetValue(False)
         else:
             self.checkbox.SetValue(True)
 
     def OnSerialConnect(self, event):
-        binprog.connectSerial(self.SerialPort.GetLineText(0), 115200)#int(self.SerialBaudRate.GetStringSelection()))
-        if binprog.ser.is_open:
+        binprog.connectSerial(self.SerialPort.GetLineText(0), int(self.SerialBaudRate.GetStringSelection()))
+        if binprog.serConnected:
             global serialBaud
             global serialPort
-            global connected
             serialBaud = self.SerialBaudRate.GetStringSelection()
             serialPort = self.SerialPort.GetLineText(0)
-            connected = True
 
-            if self.checkbox.GetValue():
+            if self.checkbox.GetValue():                            #Save the connection config
                 config.set("connection", "port", serialPort)
                 config.set("connection", "baudrate", serialBaud)
                 config.set("connection", "save", "true")
             else:
                 config.set("connection", "save", "false")
-
             with open(configPath, "w") as configFile:
                 config.write(configFile)
                 configFile.flush()
                 configFile.close()
 
-            if connected:
-                ProgrammerInterface.frame.CurSerialBaud.SetLabel(serialBaud)
-                ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
-                ProgrammerInterface.frame.Read.Enable(True)
-                if filename:
-                    ProgrammerInterface.frame.Write.Enable(True)
+            ProgrammerInterface.frame.CurSerialBaud.SetLabel(serialBaud)
+            ProgrammerInterface.frame.CurSerialPort.SetLabel(serialPort)
+            ProgrammerInterface.frame.Read.Enable(True)
+            if filename:
+                ProgrammerInterface.frame.Write.Enable(True)
             self.Destroy()
 
 class LicenceUI(ProgrammerUI.Licence):
@@ -138,9 +138,9 @@ class UI(wx.App):
 
 if __name__ == "__main__":
     ProgrammerInterface = UI(0)
-    #binprog.connectSerial(config["connection"]["port"],config["connection"]["baudrate"])
-    if True: #binprog.serConnected:
-        connected = True
+    if config["connection"]["save"]=="true":
+        binprog.connectSerial(config["connection"]["port"],int(config["connection"]["baudrate"]))
+    if binprog.serConnected:
         serialBaud = config["connection"]["baudrate"]
         serialPort = config["connection"]["port"]
         ProgrammerInterface.frame.CurSerialBaud.SetLabel(str(serialBaud))

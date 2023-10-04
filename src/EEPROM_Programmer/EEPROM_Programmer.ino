@@ -86,7 +86,7 @@ void printContents(int _nBytes) { // Print the entire ROM in a CSV format
   }
 }
 
-void blockWrite(uint32_t _numBytes) { // Write multiple bytes sequentially from the start of the ROM
+void blockWrite(uint32_t _numBytes, bool _verify) { // Write multiple bytes sequentially from the start of the ROM
   uint32_t n = 0;
   uint8_t dataLength;
   byte _serialData[3];
@@ -100,7 +100,10 @@ void blockWrite(uint32_t _numBytes) { // Write multiple bytes sequentially from 
       }
     }
   }
-  
+  if (verify) {
+    printContents(_numBytes);
+    verify = false;
+  }
 }
 
 void setup() {
@@ -143,6 +146,7 @@ uint8_t serialMode = 0;
 uint16_t address = 0;
 uint8_t writeData = 0;
 uint16_t numBytes = 0;
+bool verify = false;
 
 void loop() {
   if (Serial.available() > 0) {
@@ -183,6 +187,9 @@ void loop() {
             numBytes = 0;
             serialMode = 0;
           }
+        }else if (numBytes == 0 && serialData[0] == 'V'){
+          verify = true;
+          Serial.println("Verifying after write");
         }
         break;
       default:
