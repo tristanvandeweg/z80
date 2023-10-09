@@ -24,7 +24,7 @@ from os.path import exists
 serialBaud = 115200
 serialPort = ""
 filename = ""
-configPath = __file__[:-3]+".cfg"
+configPath = __file__[:-3]+".cfg"                                   #Fix file extension for config file
 config = configparser.ConfigParser()
 
 class MainUI(ProgrammerUI.Main):                                    #Functionality for the main menu
@@ -60,10 +60,22 @@ class MainUI(ProgrammerUI.Main):                                    #Functionali
                 self.Write.Enable(True)
 
     def OnWrite(self, event):                                       #Functionality for the write button
-        #TODO Implement bulk writing
-        print("Event handler 'OnWrite' not implemented!")
-        print(binprog.readFile(filename))
-        event.Skip()
+        file = binprog.readFile(filename)   #TODO test this
+        print("Starting write")
+        binprog.bulkWrite(filename)
+        print("Finished writing, verifying")
+        ver = binprog.read()
+        count = 0
+        for i in range(0,len(file)):
+            if file[i]==ver[i]:
+                count += 1
+                if count==10:
+                    print(".","","")
+                    count = 0
+            else:
+                print("\nError at byte "+i)
+        print("Done")
+
 
     def OnRead(self, event):                                        #Functionality for the read button
         dlg = wx.MessageDialog(self.panel_1, binprog.read(), "EEPROM Contents")
@@ -83,7 +95,7 @@ class SerialSelectUI(ProgrammerUI.SerialSelect):                    #Functionali
         else:
             self.checkbox.SetValue(True)
 
-    def OnSerialConnect(self, event):
+    def OnSerialConnect(self, event):                               #Event handler for the connect button
         binprog.connectSerial(self.SerialPort.GetLineText(0), int(self.SerialBaudRate.GetStringSelection()))
         if binprog.serConnected:
             global serialBaud
@@ -109,7 +121,7 @@ class SerialSelectUI(ProgrammerUI.SerialSelect):                    #Functionali
                 ProgrammerInterface.frame.Write.Enable(True)
             self.Destroy()
 
-class LicenceUI(ProgrammerUI.Licence):
+class LicenceUI(ProgrammerUI.Licence):                              #Licence popup
     def __init__(self, *args, **kwds):
         ProgrammerUI.Licence.__init__(self, *args, **kwds)
 
@@ -127,20 +139,20 @@ class LicenceUI(ProgrammerUI.Licence):
         self.Destroy()
 
 
-class UI(wx.App):
+class UI(wx.App):                                                   #Main App
     def OnInit(self):
         self.frame = MainUI(None, wx.ID_ANY, "")
-        if config["licence"]["hide"] != "true":
+        if config["licence"]["hide"] != "true":                     #Only show licence if it is not hidden in config
             self.SetTopWindow(self.frame.licenceUI)
             self.frame.licenceUI.Show()
         self.frame.Show()
         return True
 
-if __name__ == "__main__":
+if __name__ == "__main__":                                          #Startup script
     ProgrammerInterface = UI(0)
-    if config["connection"]["save"]=="true":
+    if config["connection"]["save"]=="true":                        #Attempt to connect to serial on saved port and baudrate
         binprog.connectSerial(config["connection"]["port"],int(config["connection"]["baudrate"]))
-    if binprog.serConnected:
+    if binprog.serConnected:                                        #Set variables if connection was successful
         serialBaud = config["connection"]["baudrate"]
         serialPort = config["connection"]["port"]
         ProgrammerInterface.frame.CurSerialBaud.SetLabel(str(serialBaud))

@@ -53,7 +53,7 @@ def writeByte(_addr1, _addr2, _data):                           #Write a single 
 
 def read():                                                     #Read the entire EEPROM
     ser.write(bytearray(b'\x52\x0D\x0A'))                       #In ASCII: R CR LF
-    #sleep(1)
+    #sleep(1)#TODO test this
     o = ser.read(27500)                                         #Read the next 27500 bytes
     #with redirect_stdout(StringIO()) as f:
     contents = re.split(',\n\r',o)                              #Convert the CSV into an array
@@ -64,8 +64,11 @@ def read():                                                     #Read the entire
     return o.decode("ascii")
 
 def readFile(_filename):    #Load a binary file for writing
+    filearray = []
     with open(_filename, mode="rb") as file:
-        return file.read()
+        while (byte := file.read(1)):
+            filearray.append(byte)
+        return filearray
     
 def bulkWrite(_filename):   #Write a binary file to the entire EEPROM
     binFile = readFile(_filename) #TODO add this
@@ -73,7 +76,10 @@ def bulkWrite(_filename):   #Write a binary file to the entire EEPROM
     ser.write(bytearray(b'\x62\x0D\x0A'))
     sleep(.05)
     ser.write(bytearray(b'\x56\x0D\x0A'))
-    ser.write(bytearray(b'\x42')+8192+bytearray(b'\x0D\x0A'))
+    ser.write(bytearray([b'\x42',8192,b'\x0D\x0A']))
+    sleep(.05)
+    for i in binFile:
+        ser.write(bytearray([i,b'\x0D\x0A']))
 
 if __name__=='__main__':
     sys.exit()
