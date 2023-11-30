@@ -23,6 +23,7 @@
 .equ _ExtMem, $4000				;=16384
 .equ _StackSize, 255				;=$ff
 .equ _StackTop, $3fff			;Top of the stack
+.equ _FontStart, ;TODO insert address
 ;--------------------------------
 ;I/O Locations
 ;--------------------------------

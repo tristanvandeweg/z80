@@ -57,16 +57,22 @@ strBootError:
 _PrintS:						;Address of string to print in hl, string must end in 0
 	ld a,(hl)
 	cp a,0
-	ret z
+	ret z						;If a = 0, return
 	call _PrintB
-`	inc hl
+	inc hl
 	jr _PrintS
 
 _PrintB							;Byte to print in a
-	;TODO add printing
+	sla a						;Double a register
+	ld bc, _FontStart
+	ld e, a
+	ld a, c
+	add a, e
+	ld c, a
+	
 	ret
 
-_ClrScrn:					;Clear the LCD
+_ClrScrn:						;Clear the LCD
 	ld a,%00000000
 	out _DisplayCmd,a
 	ld a,%00000001
