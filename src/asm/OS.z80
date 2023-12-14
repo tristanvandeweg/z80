@@ -25,6 +25,7 @@ Boot:
 	ld sp,hl				;
 	ld a,%10000000			;Set IO1 ports to mode 0 output
 	out ($03),a				;
+	;TODO Enable and clear display
 	ld a,(_ExtMem)			;Check for program start byte
 	cp a,$80				;
 	jp z,_ExtMem+1			;Jump to program if there is one
@@ -64,13 +65,36 @@ _PrintS:						;Address of string to print in hl, string must end in 0
 
 _PrintB							;Byte to print in a
 	sla a						;Double a register
-	ld bc, _FontStart
-	ld e, a
-	ld a, c
-	add a, e
-	ld c, a
+	ld bc, _FontStart			;Set BC to the start address of the character table
+	ld e, a						;
+	ld a, c						;
+	add a, e					;
+	ld c, a						;Add A to BC, result is the address of the character in BC
 	
+	ld d,(_CursorX)				;Load cursor position to DE
+	ld e,(_CursorY)				;
+
+								;Second bit of D is CS1 or CS2
+								;Next 3 bits of D is page address
+								;Last 3 bits of D is the bit position
+
 	ret
+
+_WriteVRAM						;Write VRAM to display
+	ld b, 0						;Start at 0,0
+	ld c, 0
+	ld a, 0						;Register for display control pins
+
+
+_SetDisplayPosition
+	bit 6, b					;Test the display half if Z=1 it's the left half
+	jr z, 2						
+	set 6, a					;Set the pin for the correct display half
+	jr 2						;
+	set 7, a					;
+
+	set 5, a						;Reset pin should be set
+	set 2, a						;Enable pin should be set
 
 _ClrScrn:						;Clear the LCD
 	ld a,%00000000

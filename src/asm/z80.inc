@@ -18,17 +18,21 @@
 ;--------------------------------
 ;Memory Locations
 ;--------------------------------
-.equ _RAM, $2000					;=8192
-.equ _ROM, 0						;=0
+.equ _RAM, $2000				;=8192
+.equ _ROM, 0					;=0
 .equ _ExtMem, $4000				;=16384
-.equ _StackSize, 255				;=$ff
+.equ _StackSize, 255			;=$ff
 .equ _StackTop, $3fff			;Top of the stack
-.equ _FontStart, ;TODO insert address
+.equ _FontStart, 				;TODO insert address
+.equ _VRAM, $2000				;VRAM in start of RAM
+.equ _CursorX, $2400			;1 Byte for X of screen
+.equ _CursorY, $2401			;1 Byte for Y of screen
+.equ _UserRAM, $2402			;1kiB of VRAM
 ;--------------------------------
 ;I/O Locations
 ;--------------------------------
-.equ _Display, $00
-.equ _DisplayCmd, $01
+.equ _Display, $00				;IO address of display data
+.equ _DisplayCmd, $01			;IO address of display command pins [CS1, CS2, RST, R/W, D/C, E, 0, 0] (R and D = 1, W and C = 0)
 ;--------------------------------
 ;ROM Calls
 ;--------------------------------
