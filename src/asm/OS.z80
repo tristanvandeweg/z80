@@ -80,21 +80,33 @@ _PrintB							;Byte to print in a
 
 	ret
 
-_WriteVRAM						;Write VRAM to display
-	ld b, 0						;Start at 0,0
-	ld c, 0
-	ld a, 0						;Register for display control pins
+; _WriteVRAM						;Write VRAM to display
+; 	ld b, 0						;Start at 0,0
+; 	ld c, 0
+; 	ld a, 0						;Register for display control pins
 
 
-_SetDisplayPosition
+_SetDisplayPosition:			;b = x address, c = y address 
+	ld a, %00100100				;Set fixed pins
 	bit 6, b					;Test the display half if Z=1 it's the left half
 	jr z, 2						
 	set 6, a					;Set the pin for the correct display half
 	jr 2						;
 	set 7, a					;
 
-	set 5, a						;Reset pin should be set
-	set 2, a						;Enable pin should be set
+;X value
+	srl b						;Shift b register three to the right
+	srl b
+	srl b
+	set 3, b					;Set command value to bit 3-7 of register b
+	set 4, b
+	set 5, b
+	res 6, b
+	set 7, b
+
+;Y value
+	res 7, c
+	set 6, c
 
 _ClrScrn:						;Clear the LCD
 	ld a,%00000000
@@ -103,8 +115,47 @@ _ClrScrn:						;Clear the LCD
 	out _Display,a
 	ret
 
-_EnableLCD:						;DB0-7 on PA of IO1,	CS1,CS2,RST,RW,DI,E on PB of IO1
-	ld a,%00100100
-	out _DisplayCmd,a
-	ld a,%01111100
-	out _Display,a
+;_EnableLCD:						;DB0-7 on PA of IO1,	CS1,CS2,RST,RW,DI,E on PB of IO1
+;	ld a,%00100100
+;	out _DisplayCmd,a
+;	ld a,%01111100
+;	out _Display,a
+
+_DisplayOn:
+	ld a, %00111111
+	out _Display, a
+	ld a, %11100100
+	out _DisplayCmd, a
+	
+_DisplayOff:
+	ld a, %00111110
+	out _Display, a
+	ld a, %11100100
+	out _DisplayCmd, a
+
+_DrawSprite:						;HL = sprite address
+	ld b, (hl)						;load top half of character in b
+	inc hl							;increment hl
+	ld c, (hl)						;load bottom half of chracter in c
+
+	ld a, (_CursorX)				;load x position into a
+	srl a							;shift a to the right
+	srl a			
+	srl a	
+	ld hl, _VRAM					;load _VRAM into hl
+	add hl, a						;add x offset onto vram start position
+
+	ld a, (_CursorY)				;load y position into a
+	sla a							;multiply by 16
+	sla a
+	sla a
+	sla a
+	add hl, a						;add y offset to hl
+
+	ld a, b							;load first 
+	ld d, %11110000
+	and d
+	ld b, (hl)
+	or b
+
+
