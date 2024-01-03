@@ -1,4 +1,0 @@
-(fp_lib_table
-  (version 7)
-  (lib (name "Connector_Edge")(type "KiCad")(uri "${KIPRJMOD}/KiCAD/FX27-40S")(options "")(descr ""))
-)
