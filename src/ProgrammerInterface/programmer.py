@@ -1,5 +1,5 @@
 #The main script for programming binaries to the EEPROM
-#Copyright (C) 2023  Tristan van de Weg & Marijn Vollenberg
+#Copyright (C) 2023-2024  Tristan van de Weg & Marijn Vollenberg
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -63,17 +63,17 @@ class MainUI(ProgrammerUI.Main):                                    #Functionali
         file = binprog.readFile(filename)   #TODO test this
         print("Starting write")
         binprog.bulkWrite(filename)
-        print("Finished writing, verifying")
-        ver = binprog.read()
-        count = 0
-        for i in range(0,len(file)):
-            if file[i]==ver[i]:
-                count += 1
-                if count==10:
-                    print(".","","")
-                    count = 0
-            else:
-                print("\nError at byte "+i)
+        #print("Finished writing, verifying")
+        #ver = binprog.read()
+        #count = 0
+        #for i in range(0,len(file)):
+        #    if file[i]==ver[i]:
+        #        count += 1
+        #        if count==10:
+        #            print(".","","")
+        #            count = 0
+        #    else:
+        #        print("\nError at byte "+i)
         print("Done")
 
 

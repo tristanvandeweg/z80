@@ -1,5 +1,5 @@
 ;OS for boot ROM with bootcode and romcalls
-;Copyright (C) 2023  Tristan van de Weg & Marijn Vollenberg
+;Copyright (C) 2023-2024  Tristan van de Weg & Marijn Vollenberg
 ;
 ;    This program is free software; you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 ;    You should have received a copy of the GNU General Public License along
 ;    with this program; if not, write to the Free Software Foundation, Inc.,
 ;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-.equ OSfile, 1
-.include "z80.inc"
+#define OSfile
+#include "inc/z80.inc"
 
 ;--------------------------------
 ;Boot Code
@@ -23,12 +23,19 @@
 Boot:
 	ld hl,_StackTop			;Set stack pointer to correct place in RAM
 	ld sp,hl				;
-	ld a,%10000000			;Set IO1 ports to mode 0 output
+
+	;Start display
+
+	ld a,%10001001			;Set IO1 ports A and B to mode 0 output, set IO1 port C to mode 0 input
 	out ($03),a				;
 	;TODO Enable and clear display
+	call _DisplayOn
+	;Attempt to start a program from external memory
+
 	ld a,(_ExtMem)			;Check for program start byte
-	cp a,$80				;
+	cp a,_ExtPrgmInd		;
 	jp z,_ExtMem+1			;Jump to program if there is one
+
 	ld hl,strBootError		;Print Error message if there is no program
 	call _PrintS			;
 Stop:
@@ -37,7 +44,7 @@ StopLoop:
 	nop
 	inc a
 	cp a,$ff
-	jp z,Boot
+	jr z,Boot
 	jr StopLoop
 
 _Exit:
@@ -46,15 +53,18 @@ _Exit:
 	jp Boot
 
 strProgramExit:
-	.byte "Program finished, rebooting",0
+	.db "Program finished, rebooting",0
 
 strBootError:
-	.byte "No valid program found",0
+	.db "No valid program found",0
 
 ;--------------------------------
 ;ROM Calls
 ;--------------------------------
-.align $00ff
+
+;--------------------------------
+;Printing
+
 _PrintS:						;Address of string to print in hl, string must end in 0
 	ld a,(hl)
 	cp a,0
@@ -63,22 +73,22 @@ _PrintS:						;Address of string to print in hl, string must end in 0
 	inc hl
 	jr _PrintS
 
-_PrintB							;Byte to print in a
+_PrintB:						;Byte to print in a
 	sla a						;Double a register
-	ld bc, _FontStart			;Set BC to the start address of the character table
-	ld e, a						;
-	ld a, c						;
-	add a, e					;
-	ld c, a						;Add A to BC, result is the address of the character in BC
-	
-	ld d,(_CursorX)				;Load cursor position to DE
-	ld e,(_CursorY)				;
+	ld hl, _FontStart			;Set HL to the start address of the character table
+	ld c, a						;Put A in BC
+	ld b, 0						;
+	add hl, bc					;Add BC to HL, result is the address of the character in HL
+	jp _DrawSprite
+
+;--------------------------------
+
+	;ld d,(_CursorX)				;Load cursor position to DE
+	;ld e,(_CursorY)				;
 
 								;Second bit of D is CS1 or CS2
 								;Next 3 bits of D is page address
 								;Last 3 bits of D is the bit position
-
-	ret
 
 ; _WriteVRAM						;Write VRAM to display
 ; 	ld b, 0						;Start at 0,0
@@ -89,10 +99,12 @@ _PrintB							;Byte to print in a
 _SetDisplayPosition:			;b = x address, c = y address 
 	ld a, %00100100				;Set fixed pins
 	bit 6, b					;Test the display half if Z=1 it's the left half
-	jr z, 2						
+	jr z, _SetDisplayPositionLeft						
 	set 6, a					;Set the pin for the correct display half
-	jr 2						;
+	jr _SetDisplayPositionRight						;
+_SetDisplayPositionLeft:
 	set 7, a					;
+_SetDisplayPositionRight:
 
 ;X value
 	srl b						;Shift b register three to the right
@@ -108,32 +120,22 @@ _SetDisplayPosition:			;b = x address, c = y address
 	res 7, c
 	set 6, c
 
-_ClrScrn:						;Clear the LCD
-	ld a,%00000000
-	out _DisplayCmd,a
-	ld a,%00000001
-	out _Display,a
+;--------------------------------
+;VRAM Operations
+
+_ClearDisp:							;Clear VRAM, registers affected: a, hl, bc, de
+	xor a							;Faster than ld a, 0 and resets C
+	ld bc, _VRAM
+	ld hl, _VRAMSize
+	ld de, 1
+_ClearDispLoop:
+	ld (bc), a
+	inc bc
+	sbc hl,de
+	jr nz, _ClearDispLoop			;Loop until hl is 0
 	ret
 
-;_EnableLCD:						;DB0-7 on PA of IO1,	CS1,CS2,RST,RW,DI,E on PB of IO1
-;	ld a,%00100100
-;	out _DisplayCmd,a
-;	ld a,%01111100
-;	out _Display,a
-
-_DisplayOn:
-	ld a, %00111111
-	out _Display, a
-	ld a, %11100100
-	out _DisplayCmd, a
-	
-_DisplayOff:
-	ld a, %00111110
-	out _Display, a
-	ld a, %11100100
-	out _DisplayCmd, a
-
-_DrawSprite:						;HL = sprite address
+_DrawSprite:						;Print a 4x4 sprite to VRAM, hl = sprite address
 	ld b, (hl)						;load top half of character in b
 	inc hl							;increment hl
 	ld c, (hl)						;load bottom half of chracter in c
@@ -143,14 +145,16 @@ _DrawSprite:						;HL = sprite address
 	srl a			
 	srl a	
 	ld hl, _VRAM					;load _VRAM into hl
-	add hl, a						;add x offset onto vram start position
+	;add hl, a						;add x offset onto vram start position
 
 	ld a, (_CursorY)				;load y position into a
 	sla a							;multiply by 16
 	sla a
 	sla a
 	sla a
-	add hl, a						;add y offset to hl
+	ld c,a							;Put a in bc
+	ld b,0							;Most significant byte of bc is 0
+	add hl, bc						;add y offset to hl
 
 	ld a, b							;load first 
 	ld d, %11110000
@@ -158,4 +162,30 @@ _DrawSprite:						;HL = sprite address
 	ld b, (hl)
 	or b
 
+;--------------------------------
 
+;--------------------------------
+;Display On/Off
+
+_DisplayOn:							;Turn the display on
+	ld a, %00111111					;Display On command
+	jr _DisplayOnOff
+	
+_DisplayOff:						;Turn the display off
+	ld a, %00111110					;Display Off command
+	jr _DisplayOnOff
+
+_DisplayOnOff:						;Use DisplayOn/DisplayOff instead
+	out (_Display), a
+	ld a, %11100100					;Control signals
+	out (_DisplayCmd), a
+	nop
+	nop
+	nop
+	ld a, %00100000					;Reset control signals
+	out (_DisplayCmd), a
+	ret
+
+;--------------------------------
+
+#include "inc/characters.inc"

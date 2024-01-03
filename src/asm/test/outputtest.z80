@@ -1,26 +1,26 @@
-	ld a,%10000000
-	out ($03),a
+	ld a,%10000000	;Set all ports to output
+	out ($03),a		;
 
 Loop:
 
-	ld a,$55
-	out ($00),a
+	ld a,$55		;Output 01010101 to port A
+	out ($00),a		;
 
-	ld de,$0010
+	ld de,$0010		;Set the value for the delay
 Inner:
-	dec de
-	ld a,d
-	or e
-	jp nz,Inner
+	dec de			;Count down to 0
+	ld a,d			;
+	or e			;
+	jp nz,Inner		;
 
-	ld a,$aa
-	out ($00),a
+	ld a,$aa		;Output 10101010 to port A
+	out ($00),a		;
 
-	ld de,$0010
+	ld de,$0010		;Set the value for the delay
 Inner2:
-	dec de
-	ld a,d
-	or e
-	jp nz,Inner2
+	dec de			;Count down to 0
+	ld a,d			;
+	or e			;
+	jp nz,Inner2	;
 
-	jp Loop
+	jp Loop			;Jump to the start of the loop

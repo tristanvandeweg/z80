@@ -1,5 +1,5 @@
 #Backend for the EEPROM programming tool
-#Copyright (C) 2022-2023  Tristan van de Weg
+#Copyright (C) 2022-2024  Tristan van de Weg
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from time import sleep
 from io import StringIO
 from contextlib import redirect_stdout
 import re
+from struct import pack
 
 serConnected = False
 ser = serial.Serial()
@@ -32,11 +33,14 @@ def connectSerial(_port, _baud):                                #Connect to the 
         ser.close()
     ser.port = _port                                            #Set port and speed
     ser.baudrate = _baud
+    global serConnected
     print("Attempting to connect to "+_port+" at "+str(_baud)+" baud")
     try:
         ser.open()                                              #Attempt to connect
         if ser.is_open==True:                                   #Return if the connection was successful
             serConnected = True
+            print("Connected to programmer")
+            return
     except serial.serialutil.SerialException as err:            #Print error message if the connection failed
         print(err)
         serConnected = False
@@ -54,7 +58,8 @@ def writeByte(_addr1, _addr2, _data):                           #Write a single 
 def read():                                                     #Read the entire EEPROM
     ser.write(bytearray(b'\x52\x0D\x0A'))                       #In ASCII: R CR LF
     #sleep(1)#TODO test this
-    o = ser.read(27500)                                         #Read the next 27500 bytes
+    ser.reset_input_buffer()
+    o = ser.read_all()                                          #Read the next 27500 bytes
     #with redirect_stdout(StringIO()) as f:
     contents = re.split(',\n\r',o)                              #Convert the CSV into an array
     for i in range(0,len(contents)):#TODO Parsing of info
@@ -71,15 +76,47 @@ def readFile(_filename):    #Load a binary file for writing
         return filearray
     
 def bulkWrite(_filename):   #Write a binary file to the entire EEPROM
-    binFile = readFile(_filename) #TODO add this
+    binFile = readFile(_filename)
+    size = len(binFile)-1                                   #Get file length
+    size = pack('>H', size)
 
-    ser.write(bytearray(b'\x62\x0D\x0A'))
-    sleep(.05)
-    ser.write(bytearray(b'\x56\x0D\x0A'))
-    ser.write(bytearray([b'\x42',8192,b'\x0D\x0A']))
-    sleep(.05)
+    sizemsg = bytearray(b'\x42')
+    sizemsg.extend(size)
+    #sizemsg.extend(b'\x0D\x0A')
+    
+    print("File length: ",size)
+    print("File: ",binFile)
+
+    ser.write(bytearray(b'\x62\x0D\x0A'))                   #In ASCII: b CR LF
+    sleep(.2)
+    ser.write(bytearray(b'\x56\x0D\x0A'))                   #In ASCII: V CR LF
+    sleep(.2)
+    ser.write(sizemsg)                                      #In ASCII: B <File Length> CR LF
+    sleep(3)
+    print("Writing: ")
+
     for i in binFile:
-        ser.write(bytearray([i,b'\x0D\x0A']))
+        msg = bytearray()
+        msg.extend(i)
+        msg.extend(b'\x0A\x0A')
+        #print(msg)#DEBUG
+        ser.write(msg)                                      #Write each byte
+        sleep(.01)                                          #Limit speed
+        print(".",end="")
+    print("\nFinished writing")
+
+    ser.reset_input_buffer()
+    print("Verifying")
+    sleep(2)
+    o = ser.read_all()                                      #Read serial bus
+    #for i in range(len(o)):
+    #    if o[i] != ',' or o[i] != '\n' or o[i]:
+    #        if o[i] != binFile[i]:
+    #            print("\nError")
+    #            return
+    #        print(".",end="")
+    print(o)
+    
 
 if __name__=='__main__':
     sys.exit()

@@ -77,14 +77,15 @@ void printContents(int _nBytes) { // Print the entire ROM in a CSV format
       data[offset] = Read(base + offset);
     }
 
-    char buf[80];
-    sprintf(buf, "%04x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x",
-            base, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7],
-            data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
+    char buf[50];
+    sprintf(buf, "%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x",
+            data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
 
     Serial.println(buf);
   }
 }
+
+bool verify = false;
 
 void blockWrite(uint32_t _numBytes, bool _verify) { // Write multiple bytes sequentially from the start of the ROM
   uint32_t n = 0;
@@ -95,12 +96,13 @@ void blockWrite(uint32_t _numBytes, bool _verify) { // Write multiple bytes sequ
       dataLength = Serial.readBytes(_serialData, 3);
       if(_serialData[1] == '\n'){
         Write(n, _serialData[0]);
-        Serial.println(String("Written ") + String(_serialData[0], HEX) + String(" to ") + String(n, HEX));
+        //Serial.println(String("Written ") + String(_serialData[0], HEX) + String(" to ") + String(n, HEX));
         n++;
       }
     }
   }
   if (verify) {
+    delay(1000);
     printContents(_numBytes);
     verify = false;
   }
@@ -146,7 +148,6 @@ uint8_t serialMode = 0;
 uint16_t address = 0;
 uint8_t writeData = 0;
 uint16_t numBytes = 0;
-bool verify = false;
 
 void loop() {
   if (Serial.available() > 0) {
@@ -183,7 +184,7 @@ void loop() {
           if(dataLength > 1) {
             numBytes = serialData[1] << 8 | serialData[2];
             Serial.println(String("Bulk writing ") + String(numBytes) + String("bytes"));
-            blockWrite(numBytes);
+            blockWrite(numBytes, true);
             numBytes = 0;
             serialMode = 0;
           }

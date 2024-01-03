@@ -1,0 +1,65 @@
+;data bits on port A
+;RS on pin 0, RW on pin 1, E on pin 2 (port B)
+
+	ld a,%10000000	;Set all ports to output
+	out ($03),a		;
+	
+	
+	
+	ld a,%00111000	;8-bit mode, 2 lines, 5x7 characters
+	out ($00),a
+	ld a,0
+	out ($01),a
+	ld a,%00000100	;Set enable pin high
+	out ($01),a
+	ld a,%00000000	;Set enable low
+	out ($01),a
+	
+
+
+	
+	ld a,%00001111	;More mode set
+	out ($00),a
+	ld a,%00000000	;Set enable low
+	out ($01),a
+	ld a,%00000100	;Set enable pin high
+	out ($01),a
+	ld a,%00000000	;Set enable low
+	out ($01),a
+
+
+
+	ld a,%00000001	;Clear display
+	out ($00),a
+	ld a,0
+	out ($01),a
+	ld a,%00000100	;Set enable pin high
+	out ($01),a
+	ld a,%00000000	;Set enable low
+	out ($01),a
+	
+
+
+	ld a,%00000110	;Modes
+	out ($00),a
+	ld a,0
+	out ($01),a
+	ld a,%00000100	;Set enable pin high
+	out ($01),a
+	ld a,%00000000	;Set enable low
+	out ($01),a
+
+
+
+	ld a,$48		;H in ascii
+	out ($00),a
+	ld a,%00000001	;Set enable low and data high
+	out ($01),a
+	ld a,%00000101	;Set enable and data high
+	out ($01),a
+	ld a,%00000001	;Set enable low
+	out ($01),a
+
+Stop:
+	nop
+	jr Stop
