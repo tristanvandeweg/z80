@@ -1,0 +1,8 @@
+	ld a,%10000010	;Set port A to output and port B to input
+	out ($03),a		;
+
+loop:
+	in a,($01)
+	nop
+	out ($00),a
+	jr loop
