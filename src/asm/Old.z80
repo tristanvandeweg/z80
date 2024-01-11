@@ -1,0 +1,101 @@
+;Old unused subroutines (not working)
+
+;---------------------------------------------------------------------------------------
+
+	;ld d,(_CursorX)				;Load cursor position to DE
+	;ld e,(_CursorY)				;
+
+								;Second bit of D is CS1 or CS2
+								;Next 3 bits of D is page address
+								;Last 3 bits of D is the bit position
+
+_WriteVRAM:						;Write VRAM to display
+ 	ld b, 0						;Start at 0,0
+ 	ld c, 0
+ 	xor a						;Register for display control pins bit 5=enable, the rest is set by SetDisplayPosition
+	ld hl, _VRAM				;hl to hold address in VRAM
+_WriteVRAMLoop:
+	call _SetDisplayPosition
+	ld d, a						;Save a for command pins
+	ld a, (hl)					;Load VRAM byte to a
+	out (_Display), a			;Output VRAM Byte
+	
+	;Pulse enable pin to write
+	ld a, d
+	set 5, a					;Set enable pin
+	set 4, a					;Set Data write pin
+	out (_DisplayCmd), a
+	nop
+	nop
+	nop
+	res 5, a
+	out (_DisplayCmd), a
+
+	inc hl						;Increase registers to go to the next byte
+	ld a, b
+	cp $07						;If b is 7 y line needs to be increased
+	jr z, _WriteVRAMYInc
+	inc b
+	jr _WriteVRAMLoop
+_WriteVRAMYInc:
+	ld b, 0
+	cp 127						;If c if 127 and line end is reached, display is fully written
+	ret z
+	inc c
+	ld a, c
+	
+	jr _WriteVRAMLoop
+
+;---------------------------------------------------------------------------------------
+
+_SetDisplayPosition:			;b = x address, c = y address, register a affected
+	ld a, %00100100				;Set fixed pins
+	bit 6, c					;Test the display half if Z=1 it's the left half
+	jr z, _SetDisplayPositionLeft						
+	set 1, a					;Set the pin for the correct display half
+	jr _SetDisplayPositionRight
+_SetDisplayPositionLeft:
+	set 0, a					;Set the pin for the correct display half
+_SetDisplayPositionRight:
+
+	out (_DisplayCmd), a		;Write command pins
+	push af						;Save command pins for later
+	;xor a						;Clear a
+
+	;X value
+	;srl b						;Shift b register three to the right to eliminate the byte position bits
+	;srl b
+	;srl b
+	
+	ld a, b
+	ld d, %10111000				;Set command value to bit 3-7 of register d
+	or d						;Combine page address value and command bits
+
+	out (_Display), a
+	nop
+	nop
+	nop
+	pop af
+	res 5, a					;Set enable pin low to trigger it
+	out (_DisplayCmd), a
+
+	;Y value
+	nop
+	nop
+	nop
+	set 5, a
+	out (_DisplayCmd), a		;Set enable pin high again
+	push af
+
+	ld a, c
+	ld d, %01000000				;Set command value to bit 6-7 of register d
+	or d						;Combine column address value and command bits
+
+	out (_Display), a
+	nop
+	nop
+	nop
+	pop af
+	res 5, a
+	out (_DisplayCmd), a		;Set enable pin low to trigger it
+	ret

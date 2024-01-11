@@ -17,6 +17,7 @@
 
 _FontStart .equ $1F00		;At the last part of ROM
 _FontWidth .equ 4			;Font width in bits
+_FontLength	.equ 2			;Font length in bytes
 
 ;--------------------------------
 ;Special Characters

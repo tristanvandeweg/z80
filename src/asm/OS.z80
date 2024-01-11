@@ -14,15 +14,19 @@
 ;    You should have received a copy of the GNU General Public License along
 ;    with this program; if not, write to the Free Software Foundation, Inc.,
 ;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#define OSfile
-#include "inc/z80.inc"
+
+#define OSfile					;Some things in the include file don't need to be defined
+#include "inc/z80.inc"			;Useful values
+
+;_FontStart .equ $1F00			;TODO: remove this for final assembly
 
 ;--------------------------------
 ;Boot Code
 ;--------------------------------
 Boot:
-	ld hl,_StackTop			;Set stack pointer to correct place in RAM
-	ld sp,hl				;
+	;Set stack pointer to RAM
+	ld hl,_StackTop				;Set stack pointer to correct place in RAM
+	ld sp,hl					;
 	
 	;Set I/O
 	ld a,_ModeSetFlag|_PortAOutput|_PortBOutput|_PortClOutput|_PortCuOutput|_PortCuAMode0|_PortClBMode0			;Set IO1 ports A, B and C to mode 0 output
@@ -31,36 +35,36 @@ Boot:
 	out (_IO2Cmd),a																								;
 
 	;Start display
-	;TODO Enable and clear display
 	call _DisplayInit
 	call _DisplayOn
+	call _ClearDisp
+	call _WriteVRAM
 
 	;Attempt to start a program from external memory
+	in a, (_ExtIO1)				;Check for program start byte in slot 1
+	cp a, _ExtIndPrgm			;
+	jp z, _ExtMem				;Jump to program if there is one
 
-	ld a,(_ExtIO1)			;Check for program start byte
-	cp a,_ExtPrgmInd		;
-	jp z,_ExtMem			;Jump to program if there is one
+	in a, (_ExtIO4)				;Check for program start byte in slot 2
+	cp a, _ExtIndPrgm			;
+	jp z, _ExtMem				;Jump to program if there is one
 
-	ld hl,strBootError		;Print Error message if there is no program
-	call _PrintS			;
-Stop:
-	ld a,0
-StopLoop:
-	nop
-	inc a
-	cp a,$ff
-	jr z,Boot
-	jr StopLoop
+	;Print error message
+	ld hl,strBootError			;Print Error message if there is no program
+	call _PrintS				;
 
-_Exit:
+	halt						;Halt the CPU if no program is found
+
+_Exit:							;Print program finished message and halt when a program has finished
+	call _ClearDisp
 	ld hl,strProgramExit
 	call _PrintS
-	jp Boot
+	halt
 
-strProgramExit:
-	.db "Program finished, rebooting",0
+strProgramExit:					;Successful execution of program
+	.db "Program finished, halting",0
 
-strBootError:
+strBootError:					;No programs found
 	.db "No valid program found",0
 
 ;--------------------------------
@@ -71,140 +75,227 @@ strBootError:
 ;Printing
 
 _PrintS:						;Address of string to print in hl, string must end in 0
+	;hl	= String address counter
+	;a	= Byte to print
+
 	ld a,(hl)
-	cp a,0
+
+	cp a,0						;Check for end byte
 	jr z, _WriteVRAM			;If a = 0, write vram and then return
-	push hl
-	call _PrintB
-	pop hl
-	inc hl
+
+	push hl						;Preserve hl in the stack
+	call _PrintB				;Print the byte
+	pop hl						;Retrieve hl from the stack
+
+	inc hl						;Go to the next byte
 	jr _PrintS
 
+
+
 _PrintB:						;Byte to print in a
+	;hl	= Character sprite address
+	;a	= ASCII byte / sprite address offset
+	;bc	= Sprite address offset
+
+	ld hl, _FontStart			;Set HL to the start address of the character table ;TODO: add support for other sprite tables and other font sizes
+
+	;Add a*2 to hl
 	sla a						;Double a register
-	ld hl, _FontStart			;Set HL to the start address of the character table
 	ld c, a						;Put A in BC
 	ld b, 0						;
 	add hl, bc					;Add BC to HL, result is the address of the character in HL
-	jr _DrawSprite
+
+	jp _DrawSprite
+
+
 
 ;--------------------------------
 
-	;ld d,(_CursorX)				;Load cursor position to DE
-	;ld e,(_CursorY)				;
+_WriteVRAM:						;[a,bc,d,hl]Copy entirety of VRAM onto the display module	TODO: Change so the display orientation is fixed
+	;hl	= VRAM address counter
+	;a	= Display data / command pins
+	;b	= Page address counter
+	;c	= Column address counter
+	;d	= Display half + D/I command pins
 
-								;Second bit of D is CS1 or CS2
-								;Next 3 bits of D is page address
-								;Last 3 bits of D is the bit position
+	ld hl, _VRAM
+	ld bc, $077f				;07 into b, 7f into c
 
-_WriteVRAM:						;Write VRAM to display
- 	ld b, 0						;Start at 0,0
- 	ld c, 0
- 	xor a						;Register for display control pins bit 5=enable, the rest is set by SetDisplayPosition
-	ld hl, _VRAM				;hl to hold address in VRAM
 _WriteVRAMLoop:
-	call _SetDisplayPosition
-	ld d, a						;Save a for command pins
-	ld a, (hl)					;Load VRAM byte to a
-	out (_Display), a			;Output VRAM Byte
-	
-	;Pulse enable pin to write
-	ld a, d
-	set 5, a					;Set enable pin
-	set 4, a					;Set Data write pin
-	out (_DisplayCmd), a
-	nop
-	nop
-	nop
-	res 5, a
-	out (_DisplayCmd), a
+	ld d, 0						;Clear d
 
-	inc hl						;Increase registers to go to the next byte
-	ld a, b
-	cp $0f						;If b is 15 y line needs to be increased
-	jr z, _WriteVRAMYInc
-	inc b
+	;Display half selection
+	bit 6, c					;Test for display half
+	jr z, _WriteVRAMLeftHalf
+	set 1, d					;Set CS2 for the right half of the display
+	jr _WriteVRAMRightHalf		;TODO: test this hack if it works
+	;.db %11001010				;TODO:jp z,xxxx	Because this condition will never be met it will skip over the next 2 bytes, containing the next instruction.
+_WriteVRAMLeftHalf:
+	set 0, d					;Set CS1 for the left half of the display
+_WriteVRAMRightHalf:
+
+	;Writing page address
+	ld a, %10111000				;Command for setting the page address register
+	or b						;Add page address to a
+	call _WriteDisplay
+
+	;Writing column address
+	ld a, %01000000				;Command for setting the column address register
+	or c						;Bit 6 doesn't need to be masked
+	call _WriteDisplay
+
+	;Copy data to display
+	set 4, d					;Set D/I pin to data
+	ld a, (hl)					;Copy display data to a
+	call _WriteDisplay
+
+	;Move to next position
+	inc hl
+	dec b
+	jp m, _WriteVRAMColumnDec	;If b is <0 go to the next line, jr can't check for S flag
 	jr _WriteVRAMLoop
-_WriteVRAMYInc:
-	ld b, 0
-	cp 63						;If c if 63 and line end is reached, display is fully written
-	ret z
-	inc c
-	ld a, c
-	
-	jr _WriteVRAMLoop
 
+_WriteVRAMColumnDec:
+	ld b, $07
+	dec c
+	jp p, _WriteVRAMLoop		;Loop if c is >=0, else end the subroutine. jr can't check for S flag
 
-_SetDisplayPosition:			;b = x address, c = y address, register a affected
-	ld a, %00100100				;Set fixed pins
-	bit 6, b					;Test the display half if Z=1 it's the left half
-	jr z, _SetDisplayPositionLeft						
-	set 1, a					;Set the pin for the correct display half
-	jr _SetDisplayPositionRight
-_SetDisplayPositionLeft:
-	set 0, a					;Set the pin for the correct display half
-_SetDisplayPositionRight:
-
-	out (_DisplayCmd), a		;Write command pins
-	push af						;Save command pins for later
-	;xor a						;Clear a
-
-	;X value
-	;srl b						;Shift b register three to the right to eliminate the byte position bits
-	;srl b
-	;srl b
-	
-	ld a, b
-	ld d, %10111000				;Set command value to bit 3-7 of register d
-	or d						;Combine page address value and command bits
-
-	out (_Display), a
-	nop
-	nop
-	nop
-	pop af
-	res 5, a					;Set enable pin low to trigger it
-	out (_DisplayCmd), a
-
-	;Y value
-	nop
-	nop
-	nop
-	set 5, a
-	out (_DisplayCmd), a		;Set enable pin high again
-	push af
-
-	ld a, c
-	ld d, %01000000				;Set command value to bit 6-7 of register d
-	or d						;Combine column address value and command bits
-
-	out (_Display), a
-	nop
-	nop
-	nop
-	pop af
-	res 5, a
-	out (_DisplayCmd), a		;Set enable pin low to trigger it
 	ret
 
-	
+
+
+_WriteDisplay:
+	;a	= Display data / command pins
+	;d	= Display half + D/I command pins
+
+	out (_Display), a
+	ld a, %00100100				;Reset, enable and write pins
+	or d						;Combine with display half + D/I pins
+	out (_DisplayCmd), a
+	res 5, a					;Disable enable pin to trigger falling edge
+	nop
+	nop
+	nop
+	out (_DisplayCmd), a		;Write disabled enable pin
+
+	ret
+
+
 
 ;--------------------------------
 ;VRAM Operations
 
-_ClearDisp:							;Clear VRAM, registers affected: a, hl, bc, de
+_ClearDisp:							;[a,bc,de,hl]Clear VRAM					;TODO: Remove: registers affected: a, hl, bc, de
+	;bc	= Address counter
+	;hl	= Size counter
+	;a	= 0
+	;de	= 1
+
 	ld bc, _VRAM
 	ld hl, _VRAMSize
-	ld de, 1
-_ClearDispLoop:						;Don't call
+	ld de, 1						;Used for decreasing hl
 	xor a							;Faster than ld a, 0 and resets C flag
-	ld (bc), a
-	inc bc
-	sbc hl,de
+_ClearDispLoop:						;Don't call
+	ld (bc), a						;Put 0 in the current address
+	inc bc							;Go to the next address
+	sbc hl,de						;Decrease hl
 	jr nz, _ClearDispLoop			;Loop until hl is 0
+
 	ret
 
-_DrawSprite:						;Print a 4x4 sprite to VRAM, hl = sprite address
+_DrawSpriteNEW:						;TODO: Rename this
+	;a	= Sprite data
+	;b	= Sprite position / Address
+	;c	= Sprite position / Address
+	;d	= Sprite width(bit 0-3) / sprite length(bit 4-7)
+	;e	= bitmask
+	;hl	= Sprite address
+
+	push hl							;hl will temporarily be used for calculating the start address in VRAM
+	ld hl, _VRAM
+
+	;Load initial address for the sprite
+	ld b, 0
+	;ld c, (_CursorX)				;FIXME:Load x position into a
+	srl	c							;Bit 0-2 of x position indicate byte position, they are not needed yet
+	srl c
+	srl c
+
+	add hl, bc
+
+	xor a							;Faster than ld a, 0
+	;ld c, (_CursorY)				;FIXME:Y position needs to be multiplied by 16 to get the correct offset value (128/8=16)
+	sla c
+	sla c
+	sla c							;During this shift a carry might need to happen
+	adc a, 0						;Add the carry bit to a if needed
+	sla a
+	sla c							;Also shift the carry register
+	adc a, 0						;Add the second carry bit to a if needed
+	ld b, a
+
+	add hl, bc
+
+	;ld bc, hl
+	pop hl							;Pop hl to get the sprite address back
+
+	;Mask the sprite width
+	ld a, d							;Mask the sprite width into a
+	ld e, %00001111					;Mask for the sprite width
+	and e
+
+	ld e, a							;Do a = 8 - a to get the amount of bitshifts required
+	ld a, $07						;
+	sub e							;
+	
+	ld e, %11111111					;Fill e with a full bitmask
+
+	jr z, _DrawSpriteFullByte		;If sprite width >= 8 don't shift the bitmask
+	jp m, _DrawSpriteFullByte
+
+_DrawSpriteShiftMask:
+	sla e							;Shift left (a) times
+	dec a
+	jr z, _DrawSpriteShiftMask
+
+_DrawSpriteFullByte:
+
+	ld a, (hl)						;Load byte of sprite
+	and e							;Apply the bitmask
+
+	push de							;Save the current bitmask to the stack
+	ex af, af'						;Switch to the alternate a register
+	ld a, (_CursorX)				;Load Cursor X into a
+	ld e, %00000111					;Mask for the bit offset
+	and e							;Mask a
+	ld e, a							;Load a into e so a can be used again
+	ex af, af'						;Switch back to the normal a register TODO: preserve zero flag
+	jr z, _DrawSpriteDontShiftSprite
+	
+
+_DrawSpriteShiftSprite:				;Shift the sprite to the right when needed
+	srl a
+	dec e
+	jr nz, _DrawSpriteShiftSprite
+
+_DrawSpriteDontShiftSprite:
+	pop de
+
+
+
+
+	;Load first 2 bytes of sprite
+	ld c, (hl)
+	inc hl
+	ld b, (hl)
+
+	
+
+
+
+_DrawSprite:						;[a,bc,de,hl]Print a 4x4 sprite to VRAM, hl = sprite address	;TODO: Make the bit offset work
+	;bc	= Sprite data / 
+
 	;Load character
 	ld b, (hl)						;load top half of character in b
 	inc hl							;increment hl
@@ -246,7 +337,7 @@ _DrawSpriteByte:					;Don't call
 	or e							;Combine current value with new value
 	ld (hl), a						;Put combined value in VRAM
 
-	ld de, $0010					;Go to the next line
+	ld de, $0007					;Go to the next line
 	add hl, de
 
 	ld a, b							;load first
@@ -260,7 +351,7 @@ _DrawSpriteByte:					;Don't call
 	or e							;Combine current value with new value
 	ld (hl), a						;Put combined value in VRAM
 
-	ld de, $0010					;Go to the next line
+	ld de, $0007					;Go to the next line
 	add hl, de
 
 	ld b, c							;Loop last code for second byte of sprite
@@ -268,28 +359,60 @@ _DrawSpriteByte:					;Don't call
 	ld a, b
 	cp 0							;Check if b is 0, if not, loop
 	jr nz, _DrawSpriteByte
+
+	ld hl, _CursorX					;Increment cursor position
+	inc (hl)						;TODO: Increase cursor by the correct amount
+	inc (hl)
+	inc (hl)
+	inc (hl)
+	inc (hl)
+	inc (hl)
+	inc (hl)
+	inc (hl)
 	ret
+
+
 
 ;--------------------------------
 
 ;--------------------------------
 ;Display On/Off
 
-_DisplayInit:						;Properly set all pins
+_DisplayInit:						;[a]Properly set all pins to start using the display module, also resets sprite cursor to 0,0
+	;a	= Pins for display control / resetting sprite cursor position
+
+	;Set reset pin on the display module
 	ld a, %00000100
 	out (_DisplayCmd), a
+
+	;Reset cursor to 0,0
+	xor a							;More efficient than ld a, 0
+	ld (_CursorX), a
+	ld (_CursorY), a
+
 	ret
 
-_DisplayOn:							;Turn the display on
+
+
+_DisplayOn:							;[a]Turn the display on
+	;a	= Display command
+
 	ld a, %00111111					;Display On command
 	jr _DisplayOnOff
 	
-_DisplayOff:						;Turn the display off
+_DisplayOff:						;[a]Turn the display off
+	;a	= Display command
+
 	ld a, %00111110					;Display Off command
-	jr _DisplayOnOff
+	;jr _DisplayOnOff				;No need to jump to _DisplayOnOff since it is right under this subroutine
 
 _DisplayOnOff:						;Use DisplayOn/DisplayOff instead
+	;a	= Display data / control pins
+	
+	;Output command
 	out (_Display), a
+
+	;Pulse enable pin to send command to display
 	ld a, %00100111					;Control signals
 	out (_DisplayCmd), a
 	nop
@@ -297,8 +420,24 @@ _DisplayOnOff:						;Use DisplayOn/DisplayOff instead
 	nop
 	ld a, %00000111					;Reset control signals
 	out (_DisplayCmd), a
+
 	ret
+
+
 
 ;--------------------------------
 
-#include "inc/characters.inc"
+;--------------------------------
+;Extra data
+
+__CodeSize:							;Used to indicate code size during assembly
+.echo "Size of script in bytes:"	;
+.echo __CodeSize					;
+
+#include "inc/characters.inc"		;Character table
+
+__FileSize:							;Used to indicate total file size during assembly
+.echo "Total file size in bytes:"	;
+.echo __FileSize					;
+
+;--------------------------------

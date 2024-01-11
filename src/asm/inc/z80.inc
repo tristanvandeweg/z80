@@ -18,7 +18,10 @@
 ;--------------------------------
 ;Fixed Values
 ;--------------------------------
-_ExtPrgmInd	.equ $80			;=Byte to indicate external program
+_ExtIndPrgm	.equ $80			;=Byte to indicate external program
+_ExtIndRAM	.equ $ab			;=Byte to indicate external RAM
+_ExtIndIO	.equ $10			;=Byte to indicate external IO
+
 _StackSize 	.equ $ff			;=255
 _VRAMSize	.equ $0400			;=1kiB
 ;--------------------------------
@@ -31,8 +34,8 @@ _ExtMem 	.equ $4000			;=16384
 _StackTop 	.equ $4000			;Top of the stack
 
 _VRAM 		.equ $2000			;VRAM in start of RAM
-_CursorX 	.equ $2400			;1 Byte for X of screen
-_CursorY 	.equ $2401			;1 Byte for Y of screen
+_CursorX 	.equ $2400			;1 Byte for X of screen (Bit 0-2=bit offset, Bit 3-6=byte position)
+_CursorY 	.equ $2401			;1 Byte for Y of screen	(1 line=15 bytes)
 
 _UserRAM 	.equ $2402			;Start of free RAM
 ;--------------------------------

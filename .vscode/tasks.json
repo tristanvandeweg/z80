@@ -17,7 +17,7 @@
             "label": "z80 Assemble",
             "type": "shell",
             "linux":{
-                "command": "${workspaceFolder}/tools/vasmz80_std ${file} -o ${fileDirname}/bin/${fileBasenameNoExtension}.bin"
+                "command": "${workspaceFolder}/tools/spasm ${file} ${fileDirname}/bin/${fileBasenameNoExtension}.bin"
             },
             "windows":{
                 "command": "${workspaceFolder}\\tools\\vasmz80_std.exe ${file} -o ${fileDirname}\\bin\\${fileBasenameNoExtension}.bin"
