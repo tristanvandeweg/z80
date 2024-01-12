@@ -34,8 +34,12 @@ _ExtMem 	.equ $4000			;=16384
 _StackTop 	.equ $4000			;Top of the stack
 
 _VRAM 		.equ $2000			;VRAM in start of RAM
-_CursorX 	.equ $2400			;1 Byte for X of screen (Bit 0-2=bit offset, Bit 3-6=byte position)
+_CursorX 	.equ $2400			;1 Byte for X of screen (Bit 0=byte half, Bit 2-4=byte position)
 _CursorY 	.equ $2401			;1 Byte for Y of screen	(1 line=15 bytes)
+_CurFont	.equ $2402			;2 Bytes for the start of the current ASCII font table (First byte of the font is the font dimensions)
+_DrawCount	.equ $2404			;1 Byte used for the _DrawSprite subroutine
+_CursorXb	.equ $2405			;1 Byte to store a copy of _CursorX
+_CursorYb	.equ $2406			;1 Byte to store a copy of _CursorY
 
 _UserRAM 	.equ $2402			;Start of free RAM
 ;--------------------------------

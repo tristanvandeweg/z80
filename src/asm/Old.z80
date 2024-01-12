@@ -99,3 +99,221 @@ _SetDisplayPositionRight:
 	res 5, a
 	out (_DisplayCmd), a		;Set enable pin low to trigger it
 	ret
+
+;---------------------------------------------------------------------------------------
+
+_PrintB:						;Byte to print in a
+	;hl	= Character sprite address
+	;a	= ASCII byte / sprite address offset
+	;bc	= Sprite address offset
+
+	ld hl, _FontStart			;Set HL to the start address of the character table ;TODO: add support for other sprite tables and other font sizes
+
+	;Add a*2 to hl
+	sla a						;Double a register
+	ld c, a						;Put A in BC
+	ld b, 0						;
+	add hl, bc					;Add BC to HL, result is the address of the character in HL
+
+	jp _DrawSprite
+
+;---------------------------------------------------------------------------------------
+
+;A
+.byte %00000011
+.byte %10100011
+.byte %00011111
+.byte %11000110
+.byte %00110001
+;.....
+;.%%%.
+;%...%
+;%...%
+;%%%%%
+;%...%
+;%...%
+;%...%
+
+;B
+.byte %00000111
+.byte %10100011
+.byte %00011111
+.byte %01000110
+.byte %00111110
+;.....	5
+;%%%%.	3 2
+;%...%	  5
+;%...%	  1 4
+;%%%%.	    4 1
+;%...%	      5
+;%...%	      2 3
+;%%%%.	        5
+;		8 8 8 8 8
+
+;---------------------------------------------------------------------------------------
+
+_DrawSprite:						;(hl)[a,bc,de,hl]Print a 4x4 sprite to VRAM, hl = sprite address	;TODO: Make the bit offset work
+.echo "DrawSprite ",_DrawSprite;Address of the subroutine
+	;bc	= Sprite data / 
+
+	;Load character
+	ld b, (hl)						;load top half of character in b
+	inc hl							;increment hl
+	ld c, (hl)						;load bottom half of chracter in c
+	push bc							;Save character on the stack for later
+
+	;Set x position
+	ld a, (_CursorX)				;load x position into a
+	srl a							;shift a to the right to remove the lower bit that indicates the position inside the byte
+	;srl a			
+	;srl a	
+	ld c,a							;Load x offset value into bc
+	ld b,0							;
+	ld hl, _VRAM					;load _VRAM into hl
+	add hl, bc						;add x offset onto vram start position
+
+	;Set y position
+	ld a, (_CursorY)				;load y position into a
+	sla a							;multiply by 16
+	sla a
+	sla a
+	jr nc, _DrawSpriteYNoCarry1		;Check if a bit needs to be carried to b
+	set 1, b						;Set bit if needed
+_DrawSpriteYNoCarry1:				;Don't call
+	sla a
+	jr nc,_DrawSpriteYNoCarry0		;Check if a bit needs to be carried to b
+	set 0, b						;Set bit if needed
+_DrawSpriteYNoCarry0:				;Don't call
+	ld c,a							;Put a in bc
+	add hl, bc						;add y offset to hl
+
+	;Draw sprite in VRAM
+	pop bc							;Get character from stack
+_DrawSpriteByte:					;Don't call
+	ld a, b							;load first 
+	ld d, %11110000					;Mask first line of the character
+	and d							;
+	;ld e, (hl)						;Get current value from VRAM
+	;or e							;Combine current value with new value
+	ld (hl), a						;Put combined value in VRAM
+
+	ld de, $0008					;Go to the next line
+	add hl, de
+
+	ld a, b							;load first
+	ld d, %00001111					;Mask second line of the character
+	and d							;
+	sla a							;Shift second line into position
+	sla a
+	sla a
+	sla a
+	;ld e, (hl)						;Get current value from VRAM
+	;or e							;Combine current value with new value
+	ld (hl), a						;Put combined value in VRAM
+
+	ld de, $0008					;Go to the next line
+	add hl, de
+
+	ld b, c							;Loop last code for second byte of sprite
+	ld c, 0							;If c is 0, in the second loop b will be 0
+	ld a, b
+	cp 0							;Check if b is 0, if not, loop
+	jr nz, _DrawSpriteByte
+
+	ret
+
+;---------------------------------------------------------------------------------------
+
+_DrawSpriteNEW:						;TODO: Rename this
+.echo "DrawSprite ",_DrawSpriteNEW;Address of the subroutine
+	;a	= Sprite data
+	;b	= Sprite position / Address
+	;c	= Sprite position / Address
+	;d	= Sprite width(bit 0-3) / sprite length(bit 4-7)
+	;e	= bitmask
+	;hl	= Sprite address
+
+	push hl							;hl will temporarily be used for calculating the start address in VRAM
+	ld hl, _VRAM
+
+	;Load initial address for the sprite
+	ld b, 0
+	ld a, (_CursorX)				;Load x position into a
+	ld c, a							;Can't load directly into c
+	srl	c							;Bit 0-2 of x position indicate byte position, they are not needed yet
+	srl c
+	srl c
+
+	add hl, bc						;Add x offset onto the starting address
+
+	ld a, (_CursorY)				;Y position needs to be multiplied by 16 to get the correct offset value (128/8=16)
+	ld c, a							;Can't load directly into c
+	xor a							;Faster than ld a, 0
+	sla c
+	sla c
+	sla c							;During this shift a carry might need to happen
+	adc a, 0						;Add the carry bit to a if needed
+	sla a
+	sla c							;Also shift the carry register
+	adc a, 0						;Add the second carry bit to a if needed
+	ld b, a
+
+	add hl, bc						;Add y offset onto the starting address
+
+	ld b, h							;Transfer hl to bc
+	ld c, l							;ld bc, hl is not an instruction
+
+	pop hl							;Pop hl to get the sprite address back
+
+	;Mask the sprite width
+	ld a, d							;Mask the sprite width into a
+	ld e, %00001111					;Mask for the sprite width
+	and e							;
+
+	ld e, a							;Do a = 8 - a to get the amount of bitshifts required
+	ld a, $07						;
+	sub e							;
+
+	;push af							;Save a to the stack for the next amount of bitshifts
+	;push de							;Save e to the stack to save the amount 
+
+	ld e, %11111111					;Fill e with a full bitmask
+
+	jr z, _DrawSpriteFullByte		;If sprite width >= 8 don't shift the bitmask, because the entire byte needs to be written
+	jp m, _DrawSpriteFullByte		;
+
+_DrawSpriteShiftMask:
+	sla e							;Shift left (a) times to create the initial bitmask
+	dec a							;
+	jr z, _DrawSpriteShiftMask		;
+
+	;Draw the section of the sprite
+_DrawSpriteFullByte:
+	ld a, (hl)						;Load byte of sprite
+	and e							;Apply the bitmask
+
+	push de							;Save the current bitmask to the stack
+	ex af, af'						;Switch to the alternate a register
+	ld a, (_CursorX)				;Load Cursor X into a
+	ld e, %00000111					;Mask for the bit offset
+	and e							;Mask a
+	ld e, a							;Load a into e so a can be used again
+	ex af, af'						;Switch back to the normal a register TODO: preserve zero flag
+	jr z, _DrawSpriteDontShiftSprite
+	
+
+_DrawSpriteShiftSprite:				;Shift the sprite to the right when needed
+	srl a
+	dec e
+	jr nz, _DrawSpriteShiftSprite
+
+_DrawSpriteDontShiftSprite:
+	pop de
+
+
+
+
+	;Load first 2 bytes of sprite
+	ld c, (hl)
+	inc hl
+	ld b, (hl)
