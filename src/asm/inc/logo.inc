@@ -1,5 +1,5 @@
 ;Logo sprite
-;Copyright (C) 2024  Tristan van de Weg & Marijn Vollenberg
+;Copyright (C) 2024  Tristan van de Weg
 ;
 ;    This program is free software; you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -15,41 +15,36 @@
 ;    with this program; if not, write to the Free Software Foundation, Inc.,
 ;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-_SpriteWidth	.equ 16
-_SpriteLength	.equ 15
+_imgLogo
+.echo ""
+.echo "Logo starting address: ",_imgLogo
 
-;Z
-.byte %0111111111111110
-.byte %0110000000001100
-.byte %0100000000110000
-.byte %0000000011000000
-.byte %0000001100000000
-.byte %0000110000000010
-.byte %0011000000000110
-.byte %0111111111111110
-;.%%%%%%%%%%%%%%.
-;.%%.........%%..
-;.%........%%....
-;........%%......
-;......%%........
-;....%%........%.
-;..%%.........%%.
-;.%%%%%%%%%%%%%%.
+il_FontDim .equ $44			;Font size in 4x4 sprites (4x4)
 
-;80
-.byte %0000000000000000
-.byte %0111000111000000
-.byte %1000101000100000
-.byte %1000101000100000
-.byte %0111001000100000
-.byte %1000101000100000
-.byte %1000101000100000
-.byte %0111000111000000
+.byte fl_FontDim
+
+;Jump table
+.dw il_logo
+
+;logo
+il_logo:
+.byte
+
+
+
 ;................
-;.%%%...%%%......
-;%...%.%...%.....
-;%...%.%...%.....
-;.%%%..%...%.....
-;%...%.%...%.....
-;%...%.%...%.....
-;.%%%...%%%......
+;.%%%%%%%%%%%%%%.
+;.%%.%%.......%..
+;.%.%..%.....%...
+;...%..%....%....
+;....%%....%.....
+;...%..%..%......
+;...%..%.%.%%....
+;....%%.%.%..%...
+;......%..%..%...
+;.....%...%..%...
+;....%....%..%...
+;...%.....%..%.%.
+;..%.......%%.%%.
+;.%%%%%%%%%%%%%%.
+;................

@@ -16,7 +16,9 @@
 ;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 _fontSmall ;.equ $1F00		;At the last part of ROM
+.echo ""
 .echo "Small font starting address: ",_fontSmall
+
 _FontDim .equ $11			;Font size in 4x4 sprites (1x1)
 
 .byte _FontDim
@@ -129,6 +131,7 @@ _Char_gve .equ 0
 
 __CharStart
 .echo "Start of characters: ",__CharStart
+
 ;--------------------------------
 ;Special Characters
 ;--------------------------------
@@ -948,3 +951,10 @@ _Low_z:
 ;%%%.
 ;.%..
 ;%%%.
+
+__FontEnd
+.echo "Small font jump table size: ",__CharStart-_fontSmall
+.echo "Small font sprite size: ",__FontEnd-__CharStart
+.echo "Small font total size: ",__FontEnd-_fontSmall
+
+.echo ""

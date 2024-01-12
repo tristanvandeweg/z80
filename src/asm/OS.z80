@@ -38,7 +38,7 @@ Boot:
 	call _ClearDisp
 	call _WriteVRAM
 
-	ld hl, _fontSmall			;Set the font
+	ld hl, _fontLarge			;Set the font TODO: test the large font
 	ld (_CurFont), hl			;
 
 	;Attempt to start a program from external memory
@@ -67,7 +67,7 @@ strProgramExit:					;Successful execution of program
 
 strBootError:					;No programs found
 	;.db "No valid program found",0
-	.db " H E L L O",0
+	.db "HELLO WORLD",0
 
 ;--------------------------------
 ;ROM Calls
@@ -85,7 +85,7 @@ _PrintS:						;Address of string to print in hl, string must end in 0
 	ld a,(hl)
 
 	cp a,0						;Check for end byte
-	jr z, _WriteVRAM			;If a = 0, write vram and then return
+	jp z, _WriteVRAM			;If a = 0, write vram and then return
 
 	push hl						;Preserve hl in the stack
 	call _PrintB				;Print the byte
@@ -121,20 +121,20 @@ _PrintB:						;Byte to print in a
 
 	ld a, (_CursorX)			;Copy CursorX to CursorXb
 	ld (_CursorXb), a			;
+	ld a, (_CursorY)			;Copy CursorY to CursorYb
+	ld (_CursorYb), a			;
 	pop af
-
 
 	sub $20						;Removes all of the unprintable characters from a
 	jr nz, _PrintBChar			;Don't print a space
 
-	ld hl, _CursorX				;Increase cursor x by one to insert a space
-	inc (hl)					;
+	call _MoveToNextChar
 	ret							;Return after printing space
 
 _PrintBChar:
 	
 	dec a						;Offset the table by 1
-	
+
 	;Add a*2 to hl to get the correct location in the jump table
 	sla a						;Double a register
 	ld c, a						;Put A in BC
@@ -152,6 +152,7 @@ _PrintBLoop:
 
 	call _DrawSprite			;Draw the sprite
 	inc hl						;Go to the next sprite
+	inc hl						;
 	dec d						;Go to the next horizontal sprite
 	jr z, _PrintBNextLine		;Go to the next line if necessary
 
@@ -183,12 +184,63 @@ _PrintBNextLine:
 
 	dec e						;Go to the next vertical sprite
 	pop hl
-	ret z						;If the last line is reached return
+	jr nz, _PrintBLoop			;If the last line is reached return
 
-	jr _PrintBLoop
+	ld a, (_CursorYb)			;Reset y of the cursor to the original position
+	ld (_CursorY), a
+
+	call _MoveToNextChar		;Increment the cursor position
+	ret
 
 
-;TODO: Next character routine
+
+_MoveToNextChar:				;Moves the cursor to the next point with the current font size
+.echo "MoveToNextChar ",_MoveToNextChar;Address of the subroutine
+	;Affected registers: af, bc, hl
+	push af
+	push bc
+	push hl
+
+	;Load character width
+	ld hl, (_CurFont)
+	ld a, (hl)
+
+	ld b, %11110000
+	and b
+	srl a
+	srl a
+	srl a
+	srl a
+	ld b, a
+
+	;Add the character width onto the cursor position
+	ld a, (_CursorX)
+	add a, b
+	cp 16
+	jp p, _MoveToNextCharLine	;If the cursor exceeds the line width, move to the next line
+	ld (_CursorX), a
+	jr _MoveToNextCharExit
+
+_MoveToNextCharLine:			;Don't call
+	xor a						;Set X cursor to 0
+	ld (_CursorX), a			;
+
+	ld a, (hl)					;Load character size values
+	ld b, %00001111				;Mask character height
+	and b
+	ld b, a
+
+	ld a, (_CursorY)			;Add character height to cursor
+	add a, b					;
+	ld (_CursorY), a			;
+	
+_MoveToNextCharExit:			;Don't call
+	pop hl
+	pop bc
+	pop af
+	ret
+
+
 
 ;--------------------------------
 
@@ -201,7 +253,7 @@ _WriteVRAM:						;[a,bc,d,hl]Copy entirety of VRAM onto the display module	TODO:
 	;d	= Display half + D/I command pins
 
 	ld hl, _VRAM
-	ld bc, $077f				;07 into b, 7f into c
+	ld bc, $077f				;07 into b, 7f into c TODO: change 00 to 07 if fix doesnt work
 
 _WriteVRAMLoop:
 	ld d, 0						;Clear d
@@ -217,9 +269,14 @@ _WriteVRAMLeftHalf:
 _WriteVRAMRightHalf:
 
 	;Writing page address
+	push bc						;
+	ld a, $07					;Do b = 7 - b to flip the screen
+	sub b						;
+	ld b, a						;
 	ld a, %10111000				;Command for setting the page address register
 	or b						;Add page address to a
-	call _WriteDisplay
+	pop bc						;
+	call _WriteDisplay			;
 
 	;Writing column address
 	ld a, %01000000				;Command for setting the column address register
@@ -229,6 +286,8 @@ _WriteVRAMRightHalf:
 	;Copy data to display
 	set 4, d					;Set D/I pin to data
 	ld a, (hl)					;Copy display data to a
+	call _FlipA					;Mirror contents of a
+
 	call _WriteDisplay
 
 	;Move to next position
@@ -369,8 +428,8 @@ _DrawSpriteByte:					;Don't call
 
 _DrawSpriteSkipShift:				;Don't call
 
-	;ld e, (hl)						;Get the current byte from VRAM
-	;or e							;Combine the current data with the new data
+	ld e, (hl)						;Get the current byte from VRAM TODO: fix this
+	or e							;Combine the current data with the new data
 	ld (hl), a						;Put combined data into VRAM
 
 	ld de, $0008					;Add 8 bytes to go to the next line
@@ -464,12 +523,34 @@ _DisplayOnOff:						;Use DisplayOn/DisplayOff instead
 ;--------------------------------
 
 ;--------------------------------
-;Extra data
+;Useful routines
 
-.echo ""
+_FlipA:								;(a)[a] Flips the contents of the A register
+	push bc							;Preserve bc registers
+	ld b, a							;Load a into b
+	xor a							;Clear a
+	ld c, $07						;Start value for loop
+
+_FlipALoop:							;Don't call
+	rr b							;Rotate b right
+	rla								;Rotate the carry into a from the left
+
+	dec c
+	jr nz, _FlipALoop				;Loop until c=0
+
+	pop bc
+	ret
+
+
+
+;--------------------------------
+
+;--------------------------------
+;Extra data
 __CodeSize:							;Used to indicate code size during assembly
 
-#include "inc/fontSmall.inc"		;Character table
+#include "inc/fontSmall.inc"		;Character table (small font)
+#include "inc/fontLarge.inc"		;Character table (large font)
 
 .echo ""
 .echo "Size of script in bytes: ",__CodeSize
