@@ -1,0 +1,67 @@
+	ld		de, $2084	;D=32, E=132
+	call UMultDE
+	ld h, d
+	ld l, e
+	ld de, $8420		;D=132, E=32
+	call UDivDE
+	halt
+
+UMultDE:
+	.echo "UMultDE ",UMultDE;Address of the subroutine
+	;Affected registers: af, bc, hl
+
+	push	af					;Store the affected registers
+	push	bc					;
+	push	hl					;33 cc
+
+	ld		h, d				;Put D in HL 4cc
+	ld		d, 0				;Put E in DE 7cc
+
+	sla		h					;8cc
+	sbc		a, a				;4cc
+	and		e					;4cc
+	ld		l, a				;4cc
+
+	ld		b, 7				;Loop 7 times	7cc
+_UMultDEloop:
+	add		hl, hl				;Same as sla hl (there is no 16-bit shift) 11cc
+	jr		nc, $+3				;if yes 12cc, if not 7cc
+	add		hl, de				;11cc
+
+	djnz	_UMultDEloop		;Loop until B is 0 on loop 13cc, if not loop 8cc
+
+	ld		d, h				;Put the result in DE 4cc
+	ld		e, l				;4cc
+
+	pop		hl					;Restore the affected registers
+	pop		bc					;
+	pop		af					;30cc
+	ret							;10cc
+
+
+UDivDE:
+	.echo "UDivDE ",UDivDE;Address of the subroutine
+	;Affected registers: af, bc
+
+	push	af					;Store the affected registers
+	push	bc					; 22cc
+
+	xor		a					;4cc
+
+	ld		b, 8				;7cc
+_UDivDEloop:
+	sla		d					;Load the top bit of D
+	rla							;Put the top bit of D in A
+
+	cp		e					;Do A-E
+	jr		c, $+4				;If A < E skip the next instructions
+	sub		e					;Subtract E from A
+	inc		d					;The result will be in D
+
+	djnz	_UDivDEloop			;Loop until B is 0
+
+	ld		e, a				;Place the remainder in E
+
+	pop		bc					;Restore the affected registers
+	pop		af					;
+	ret

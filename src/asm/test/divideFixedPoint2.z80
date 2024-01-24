@@ -1,0 +1,34 @@
+;Input = b, c
+;
+;Output = bc(Fix8.8) = b / c
+;
+;Destroyed = bc
+;
+;Divides b by c and places the result in bc as a FixP8.8 value
+;
+;This is a very slow routine that can be optimized
+divide:
+	push hl		;Preserve registers
+	push de		;
+
+	ld h, b		;Load b into the integer part of hl
+	ld l, 0		;Load 0 into the fraction part of hl
+	ld b, 0		;Load 0 into the integer part of bc
+				;C is already in the fraction part of bc
+	ld de, 0	;Answer counter
+
+	;or a		;reset carry flag
+
+	scf			;Reset carry flag
+	ccf			;
+
+divideLoop:
+	sbc hl, bc	;Repeated subtraction = division
+	jr c, divideEnd
+	inc de
+	jr divideLoop
+divideEnd:
+	ld b, d
+	ld c, e
+	pop de		;Preserve registers
+	pop hl		;

@@ -56,7 +56,18 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "duplicate_footprints|119253000|135763000|7c38e6d5-05df-403e-8f05-f809898d1656|4625d6ad-4480-4c7e-810e-5fe137497288",
+        "duplicate_footprints|188087000|33909000|b365676d-9403-4071-a24a-99aff49b54ad|4625d6ad-4480-4c7e-810e-5fe137497288",
+        "duplicate_footprints|229585000|135859000|7261a135-3649-474e-9e1b-f88966611eed|4625d6ad-4480-4c7e-810e-5fe137497288",
+        "extra_footprint|119253000|135763000|7c38e6d5-05df-403e-8f05-f809898d1656|00000000-0000-0000-0000-000000000000",
+        "extra_footprint|188087000|33909000|b365676d-9403-4071-a24a-99aff49b54ad|00000000-0000-0000-0000-000000000000",
+        "extra_footprint|229585000|135859000|7261a135-3649-474e-9e1b-f88966611eed|00000000-0000-0000-0000-000000000000",
+        "extra_footprint|92360000|33940000|4625d6ad-4480-4c7e-810e-5fe137497288|00000000-0000-0000-0000-000000000000",
+        "silk_overlap|110164761|84839279|a793f8ad-c2b9-48d8-8e37-d5d1f1fb9154|5be7ec92-0a57-46bf-a298-e3e932fb3fe8",
+        "starved_thermal|166214000|80580000|bf70fda9-76a5-4ffd-9ab4-7509e4558983|188fe0b5-38e3-4f54-8e9c-0960b61c4074|F.Cu",
+        "starved_thermal|212598000|69850000|244f1fa5-f464-4f8e-b2ff-ee0f31ff3c57|d76c6f42-9d5a-44fc-9234-c444d743e726|In2.Cu"
+      ],
       "meta": {
         "version": 2
       },
@@ -397,7 +408,7 @@
       "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
-      "simulation_model_issue": "error",
+      "simulation_model_issue": "ignore",
       "unannotated": "error",
       "unit_value_mismatch": "error",
       "unresolved_variable": "error",
@@ -527,7 +538,7 @@
       "workbook_filename": ""
     },
     "page_layout_descr_file": "",
-    "plot_directory": "",
+    "plot_directory": "Plots/schematic/z80 (2.0).pdf",
     "spice_adjust_passive_values": false,
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",

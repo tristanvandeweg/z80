@@ -14,12 +14,14 @@
 ;    You should have received a copy of the GNU General Public License along
 ;    with this program; if not, write to the Free Software Foundation, Inc.,
 ;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
+;TODO: change all subroutine names to exclude the _
 ;--------------------------------
 ;Fixed Values
 ;--------------------------------
-_ExtIndPrgm	.equ $80			;=Byte to indicate external program
-_ExtIndRAM	.equ $ab			;=Byte to indicate external RAM
+_ExtIndPrgm	.equ $80			;=Byte to indicate large external program
+_ExtIndPrg2	.equ $81			;=Byte to indicate small external program
+_ExtIndRAM	.equ $ab			;=Byte to indicate large external RAM
+_ExtIndRAM2	.equ $ac			;=Byte to indicate small external RAM
 _ExtIndIO	.equ $10			;=Byte to indicate external IO
 
 _StackSize 	.equ $ff			;=255
@@ -27,9 +29,10 @@ _VRAMSize	.equ $0400			;=1kiB
 ;--------------------------------
 ;Memory Locations
 ;--------------------------------
-_RAM 		.equ $2000			;=8192
-_ROM 		.equ 0				;=0
-_ExtMem 	.equ $4000			;=16384
+_ROM 		.equ 0				;=0		($0000-$1fff)
+_RAM 		.equ $2000			;=8192	($2000-$4000)
+_ExtMem2	.equ $4000			;=16384	($4000-$7fff)
+_ExtMem 	.equ $8000			;=32768	($8000-$ffff)
 
 _StackTop 	.equ $4000			;Top of the stack
 
@@ -41,7 +44,13 @@ _DrawCount	.equ $2404			;1 Byte used for the _DrawSprite subroutine
 _CursorXb	.equ $2405			;1 Byte to store a copy of _CursorX
 _CursorYb	.equ $2406			;1 Byte to store a copy of _CursorY
 
-_UserRAM 	.equ $2402			;Start of free RAM
+_ExtSlot1	.equ $2407			;1 Byte to store what is installed in slot 1
+_ExtSlot1S	.equ $2408			;1 Byte to store the amount of banks in slot 1
+
+_ExtSlot2	.equ $2409			;1 Byte to store what is installed in slot 2
+_ExtSlot2S	.equ $240a			;1 Byte to store what is installed in slot 2
+
+_UserRAM 	.equ $2410			;Start of free RAM	($2410-$3f00)
 ;--------------------------------
 ;I/O Locations
 ;--------------------------------
@@ -87,14 +96,92 @@ _ModeSetFlag	.equ %10000000	;Use when setting I/O mode
 ;ROM Calls
 ;--------------------------------
 #ifndef OSfile					;Do not define ROMcalls for OS source
-.org $4000						;TODO add addresses for all subroutines
-_Exit			.equ $0000
-_PrintS 		.equ $0000 		;Address of string to print in hl, string must end in 0
-_PrintB 		.equ $0000		;Byte to print in a TODO fix addressing
-_WriteVRAM		.equ $0000
-_ClearDisp		.equ $0000
-_DrawSprite		.equ $0000
-_DisplayInit	.equ $0000
-_DisplayOn		.equ $0000
-_DisplayOff		.equ $0000
+.org $4000						;TODO: add addresses for all subroutines
+Exit			.equ 51			;Print exit message and halt
+;Input: HL
+;
+;Output: None
+;
+;Prints the 0-terminated string at HL to VRAM
+_PrintS 		.equ 99
+;Input: A
+;
+;Output: None
+;
+;Prints the ASCII byte in A to VRAM using the current font
+PrintB 		.equ 111
+;Input: None
+;
+;Output: None
+;
+;Moves the cursor to the next position with the current font size
+_MoveToNextChar	.equ 232
+;Input: None
+;
+;Output: None
+;
+;Clears VRAM
+_ClearVRAM		.equ 285
+;Input: None
+;
+;Output: HL, Z
+;
+;Returns the address in VRAM of the current cursor position, also returns the half of the byte in Z
+_GetDisplayPosition	.equ 310
+;Input: HL
+;
+;Output: None
+;
+;Puts the 4x4 sprite at HL in VRAM at _CursorX,_CursorY
+_DrawSprite		.equ 0
+;Input: None
+;
+;Output: None
+;
+;Copy VRAM contents to the display
+_WriteVRAM		.equ 428
+;Input: A, D
+;
+;Output: None
+;
+;Writes A and the commands spedified in D to the display
+_WriteDisplay	.equ 495
+;Input: None
+;
+;Output: None
+;
+;Sets the correct pins for the display, resets cursor to 0,0
+_DisplayInit	.equ 510
+;Input: None
+;
+;Output: None
+;
+;Turn the display on
+_DisplayOn		.equ 524
+;Input: None
+;
+;Output: None
+;
+;Turn the display off
+_DisplayOff		.equ 529
+;Input: A
+;
+;Output: A
+;
+;Flips the contents of the A register
+_FlipA			.equ 0
+;Input: A, B
+;
+;Output: HL = A * B
+;
+;Multiplies A by B (Unsigned)
+_MultAB			.equ 0
+;--------------------------------
+;Font Addresses
+;--------------------------------
+_fontSmall		.equ 0			;Small 1x1 font
+_fontLarge		.equ 0			;Large 2x2 font
+_logo			.equ 0			;4x4 Logo
+
+
 #endif							;End of non-OS ROMcalls

@@ -1,0 +1,3 @@
+	ld a, 12
+	ld b, -7
+	add a, b

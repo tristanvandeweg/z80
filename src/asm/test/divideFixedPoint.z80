@@ -1,0 +1,27 @@
+	ld a, 54
+	ld b, 31
+
+	ld c, 0
+divide:
+	sub b			;Repeated subtraction = division
+	jr c, divideEnd
+	inc c
+	jr divide
+divideEnd:
+	;add a, b		;Remainder
+
+	;A remainder
+	;B dividend
+	;C answer
+
+	ld d, c			;Integer component
+	ld c, 0
+divideFrac:
+	sub b
+	jr c, divideFracEnd
+	inc c
+	jr divideFrac
+divideFracEnd:
+	ld a, $ff
+	sub c			;Convert into fractional part
+	ld e, a

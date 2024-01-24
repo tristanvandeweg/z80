@@ -1,27 +1,100 @@
- 
-stack
-help
-quit
-help
-x
-reg
-next
-help
-cont
-reg
-help reg
-help
-quit
-re
-reg
-next
-help
-reg
-quit
 reg
 help
 stack
 quit
 reg
 exit
+quit
+reg
+nexti
+reg
+help
+reg
+quit
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+quit
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+quit
+reg
+quit
+reg
+help
+set a 36
+set b 1f
+reg
+set a $36
+reg
+set b $1f
+reg
+stepi
+reg
+quit
+set a $36
+set b $1f
+stepi
+reg
+quit
+reg
+quit
+reg
+quit
+set b $36
+set c $1f
+stepi
+reg
+stepi
+reg
+stepi
+reg
+stepi
+reg
+quit
+help
+profiler -i
+backtrace
+stepi
+backtrace
+frame
+frame 1
+help
+quit
+reg
+stepi
+reg
+stepi
+reg
+quit
+reg
+quit
+nexti
+reg
+quit
+nexti
+reg
+nexti
+quit
+nexti
+reg
+nexti
+reg
+nexti
+reg
 quit
