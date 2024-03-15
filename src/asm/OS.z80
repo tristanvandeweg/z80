@@ -23,8 +23,11 @@
 ;--------------------------------
 Boot:
 	;Set stack pointer to RAM
-	ld		hl,_StackTop		;Set stack pointer to correct place in RAM
-	ld		sp,hl				;
+	ld		hl, _StackTop		;Set stack pointer to correct place in RAM
+	ld		sp, hl				;
+
+	;Set interrupt mode
+	di							;Disable interrupts for now
 	
 	;Set I/O
 	ld		a,_ModeSetFlag|_PortAOutput|_PortBOutput|_PortClOutput|_PortCuOutput|_PortCuAMode0|_PortClBMode0	;Set IO1 ports A, B and C to mode 0 output
@@ -34,7 +37,7 @@ Boot:
 
 	;Start display
 	call	_DisplayInit
-	call	_DisplayOn
+	call	DisplayOn	
 	call	_ClearVRAM
 	call	_WriteVRAM
 
@@ -47,33 +50,44 @@ Boot:
 	ld		(_CurFont), hl		;
 
 	;Attempt to start a program from external memory TODO: detect conflicting memory and store what type of memory is installed
-	call DetectCards
+	;call	DetectCards
 
-	
+	;ld		a, (_ExtSlot1)		;Start a program from slot 1 if it's available
+	;cp		_ExtIndPrgm			;
+	;jp		z, _ExtMem			;
+	;cp		_ExtIndPrg2			;
+	;jp		z, _ExtMem2			;
 
-	in		a, (_ExtIO1)		;Check for program start byte in slot 1
-	cp		a, _ExtIndPrgm		;
-	jp		z, _ExtMem			;Jump to program if there is one
+	;ld		a, (_ExtSlot2)		;Start a program from slot 2 if it's available
+	;cp		_ExtIndPrgm			;
+	;jp		z, _ExtMem			;
+	;cp		_ExtIndPrg2			;
+	;jp		z, _ExtMem2			;
 
-	in		a, (_ExtIO4)		;Check for program start byte in slot 2
-	cp		a, _ExtIndPrgm		;
-	jp		z, _ExtMem			;Jump to program if there is one
+	;in		a, (_ExtIO1)		;Check for program start byte in slot 1
+	;cp		a, _ExtIndPrgm		;
+	;jp		z, _ExtMem			;Jump to program if there is one
+
+	;in		a, (_ExtIO4)		;Check for program start byte in slot 2
+	;cp		a, _ExtIndPrgm		;
+	;jp		z, _ExtMem			;Jump to program if there is one
 
 	;Print error message
-	ld		hl,strBootError		;Print Error message if there is no program
+	ld		hl, strBootError	;Print Error message if there is no program
 	call	_PrintS				;
 
 	halt						;Halt the CPU if no program is found
 
 Exit:							;Print program finished message and halt when a program has finished
-	.echo "Exit ",Exit			;Address of the subroutine
+	.echo "Exit	",Exit;Address of the subroutine
+
 	call	_ClearVRAM
 	ld		hl,strProgramExit
 	call	_PrintS
 	halt
 
-DetectCards:
-	.echo "DetectCards ",DetectCards;Address of the subroutine
+DetectCards:					;Detect what is installed in the memory slots
+	.echo "DetectCards	",DetectCards;Address of the subroutine
 
 	in		a, (_ExtIO1)		;Check and store what is installed in slot 1
 	ld		(_ExtSlot1), a		;
@@ -83,16 +97,16 @@ DetectCards:
 	in		a, (_ExtIO4)		;Check and store what is installed in slot 2
 	ld		(_ExtSlot2), a		;
 	in		a, (_ExtIO5)		;Check the amount of banks in slot 2
-	ld		(_ExtSlot2S)		;
+	ld		(_ExtSlot2S), a		;
 
 	ret
 
-strProgramExit:					;Successful execution of program
-	.db	"Program finished, halting",0
+strProgramExit:					;Program finished
+	.db	"Program finished",0
 
-strBootError:					;No programs found
-	.db	"No valid program found",0
-	;.db "HELLO WORLD",0
+strBootError:					;No program found
+	;.db	"No program found",0
+	.db "HELLO WORLD",0 ;TODO: remove
 
 strMemError:					;Invalid memory setup
 	.db "Invalid memory setup",0
@@ -101,6 +115,23 @@ strMemError:					;Invalid memory setup
 ;ROM Calls
 ;--------------------------------
 .echo "Subroutine addresses:"
+
+;Input: None
+;
+;Output: None
+;
+;Handles interrupts
+;
+;timing
+;HandleInt:
+;	.echo "Interrupt address:",HandleInt
+;	in		a,(_IO2A)			;Get input
+;	call PrintB					;Print in ASCII
+;	call _WriteVRAM				;
+
+;	reti
+
+
 
 ;--------------------------------
 ;Printing
@@ -113,7 +144,7 @@ __Printing:
 ;
 ;Prints the 0-terminated string at HL to VRAM
 _PrintS:
-	.echo "PrintS ",_PrintS;Address of the subroutine
+	.echo "PrintS	",_PrintS;Address of the subroutine
 	;hl	= String address counter
 	;a	= Byte to print
 
@@ -133,8 +164,10 @@ _PrintS:
 ;Output: None
 ;
 ;Prints the ASCII byte in A to VRAM using the current font
+;
+;Max: , Min: 286cc TODO: Calculate proper max ET
 PrintB:
-	.echo "PrintB ",PrintB;Address of the subroutine
+	.echo "PrintB	",PrintB;Address of the subroutine
 	;hl	= Character sprite address
 	;a	= ASCII byte / sprite address offset
 	;bc	= Sprite address offset / sprite data
@@ -152,10 +185,8 @@ PrintB:
 	ld		a, (hl)				;The first byte of the font is the font size (bit 0-3=height, bit 4-7=width)
 	ld		e, %11110000		;Get the sprite width
 	and		e					;
-	srl		a					;Shift the width into place
-	srl		a
-	srl		a
-	srl		a
+	rrca \ rrca \ rrca \ rrca	;Shift the width into place
+
 	ld		d, a				;Sprite width in d TODO: maybe increment d and e
 	ld		a, (hl)
 	ld		e, %00001111
@@ -171,10 +202,10 @@ PrintB:
 	sub		$20					;Removes all of the unprintable characters from a since printable ASCII characters start at $21
 	jr		nz, _PrintBChar		;Don't print a space
 
-	call	_MoveToNextChar
+	call	MoveToNextChar
 	jr		_PrintBExit			;Return after printing space
 
-_PrintBChar:
+_PrintBChar:					;Don't call
 	
 	dec		a					;Offset the table by 1
 
@@ -191,7 +222,7 @@ _PrintBChar:
 	push	bc					;Transfer bc to hl
 	pop		hl					;
 
-_PrintBLoop:
+_PrintBLoop:					;Don't call
 
 	call	_DrawSprite			;Draw the sprite
 	inc		hl					;Go to the next sprite
@@ -206,17 +237,14 @@ _PrintBLoop:
 
 	jr		_PrintBLoop
 
-_PrintBNextLine:
+_PrintBNextLine:				;Don't call
 	push	hl
 
 	ld		hl, (_CurFont)		;Set HL to the current font address
 	ld		a, (hl)				;The first byte of the font is the font size (bit 0-3=height, bit 4-7=width)
 	ld		d, %11110000		;Get the sprite width
 	and		d					;
-	srl		a					;Shift the width into place
-	srl		a
-	srl		a
-	srl		a
+	rrca \ rrca \ rrca \ rrca	;Shift the width into place (rotating is faster)
 	ld		d, a				;Sprite width in d
 
 	ld		hl, _CursorY		;Go to the next vertical line
@@ -232,7 +260,7 @@ _PrintBNextLine:
 	ld		a, (_CursorYb)		;Reset y of the cursor to the original position
 	ld		(_CursorY), a
 
-	call	_MoveToNextChar		;Increment the cursor position
+	call	MoveToNextChar		;Increment the cursor position
 
 _PrintBExit:					;Don't call
 	pop		hl
@@ -247,50 +275,48 @@ _PrintBExit:					;Don't call
 ;Output: None
 ;
 ;Moves the cursor to the next position with the current font size
-_MoveToNextChar:
-	.echo "MoveToNextChar ",_MoveToNextChar;Address of the subroutine
+;
+;Max: 223cc, Min: 186cc
+MoveToNextChar:
+	.echo "MoveToNextChar	",MoveToNextChar;Address of the subroutine
 	;Affected registers: af, bc, hl
-	push af
-	push bc
-	push hl
+	push	af
+	push	bc
+	push	hl
 
 	;Load character width
-	ld hl, (_CurFont)
-	ld a, (hl)
+	ld		hl, (_CurFont)
+	ld		a, (hl)
 
-	ld b, %11110000
-	and b
-	srl a
-	srl a
-	srl a
-	srl a
-	ld b, a
+	rrca \ rrca \ rrca \ rrca	;Rotating is faster and compacter, since the other half of the register is masked
+	ld		c, %00001111		;Mask is reused later to save space
+	and		c
+	ld		b, a
 
 	;Add the character width onto the cursor position
-	ld a, (_CursorX)
-	add a, b
-	cp 16
-	jp p, _MoveToNextCharLine	;If the cursor exceeds the line width, move to the next line
-	ld (_CursorX), a
-	jr _MoveToNextCharExit
+	ld		a, (_CursorX)
+	add		a, b
+	cp		16
+	jp		p, _MoveToNextCharLine	;If the cursor exceeds the line width, move to the next line
+	ld		(_CursorX), a
+	jr		_MoveToNextCharExit
 
 _MoveToNextCharLine:			;Don't call
-	xor a						;Set X cursor to 0
-	ld (_CursorX), a			;
+	xor		a					;Set X cursor to 0
+	ld		(_CursorX), a		;
 
-	ld a, (hl)					;Load character size values
-	ld b, %00001111				;Mask character height
-	and b
-	ld b, a
+	ld		a, (hl)				;Load character size values
+	and		c					;Mask character height using the same mask as before
+	ld		b, a
 
-	ld a, (_CursorY)			;Add character height to cursor
-	add a, b					;
-	ld (_CursorY), a			;
+	ld		a, (_CursorY)		;Add character height to cursor
+	add		a, b				;
+	ld		(_CursorY), a		;
 	
 _MoveToNextCharExit:			;Don't call
-	pop hl
-	pop bc
-	pop af
+	pop		hl
+	pop		bc
+	pop		af
 	ret
 
 
@@ -306,7 +332,7 @@ __VRAMOperations:
 ;
 ;Clears VRAM
 _ClearVRAM:
-	.echo "ClearVRAM ",_ClearVRAM;Address of the subroutine
+	.echo "ClearVRAM	",_ClearVRAM;Address of the subroutine
 	;bc	= Address counter
 	;hl	= Size counter
 	;a	= 0
@@ -318,6 +344,8 @@ _ClearVRAM:
 	push de
 	push hl
 
+	scf
+	ccf
 	ld bc, _VRAM
 	ld hl, _VRAMSize
 	ld de, 1						;Used for decreasing hl
@@ -340,8 +368,10 @@ _ClearVRAMLoop:						;Don't call
 ;Output: HL, Z
 ;
 ;Returns the address in VRAM of the current cursor position, also returns the half of the byte in Z
+;
+;Fix: 231cc
 _GetDisplayPosition:
-	.echo "GetDisplayPosition ",_GetDisplayPosition;Address of the subroutine
+	.echo "GetDisplayPosition	",_GetDisplayPosition;Address of the subroutine
 	;Affected registers: af, bc
 	push af							;Save registers on the stack so they are not affected in the parent subroutine
 	push bc							;
@@ -373,10 +403,10 @@ _GetDisplayPosition:
 	pop bc							;Retrieve registers from the stack
 	pop af							;
 
-	push hl							;Set the zero flag according to which half of the byte if positioned
-	ld hl, _CursorX					;
-	bit 0, (hl)						;TODO: maybe remove this (redundant)
-	pop hl							;
+	;push hl							;Set the zero flag according to which half of the byte if positioned
+	;ld hl, _CursorX					;
+	;bit 0, (hl)						;TODO: maybe remove this (redundant)
+	;pop hl							;
 
 	ret
 
@@ -387,8 +417,10 @@ _GetDisplayPosition:
 ;Output: None
 ;
 ;Puts the 4x4 sprite at HL in VRAM at _CursorX,_CursorY
+;
+;Max: 1255cc, Min: 1147cc
 _DrawSprite:
-	.echo "DrawSprite ",_DrawSprite;Address of the subroutine
+	.echo "DrawSprite	",_DrawSprite;Address of the subroutine
 	;Affected registers: af, bc, de, hl
 	push af							;Save registers on the stack so they are not affected in the parent subroutine
 	push bc							;
@@ -419,10 +451,7 @@ _DrawSpriteByte:					;Don't call
 
 	jr z, _DrawSpriteSkipShift		;Don't shift the byte if it's on the left half
 
-	srl a							;Shift a to the right half of the byte
-	srl a							;
-	srl a							;
-	srl a							;
+	rrca \ rrca \ rrca \ rrca		;Shift a to the right half of the byte (rotate is faster)
 
 _DrawSpriteSkipShift:				;Don't call
 
@@ -475,8 +504,10 @@ __DisplayOperations:
 ;Output: None
 ;
 ;Copy VRAM contents to the display
+;
+;
 _WriteVRAM:
-	.echo "WriteVRAM ",_WriteVRAM;Address of the subroutine
+	.echo "WriteVRAM	",_WriteVRAM;Address of the subroutine
 	;hl	= VRAM address counter
 	;a	= Display data / command pins
 	;b	= Page address counter
@@ -498,11 +529,13 @@ _WriteVRAMLoop:
 	;Display half selection
 	bit 6, c					;Test for display half
 	jr z, _WriteVRAMLeftHalf
-	set 1, d					;Set CS2 for the right half of the display
+	set 1, d
+	;res 0, d					;Set CS2 for the right half of the display
 	jr _WriteVRAMRightHalf		;TODO: test this hack if it works
 	;.db %11001010				;TODO:jp z,xxxx	Because this condition will never be met it will skip over the next 2 bytes, containing the next instruction.
 _WriteVRAMLeftHalf:
-	set 0, d					;Set CS1 for the left half of the display
+	set 0, d
+	;res 1, d					;Set CS1 for the left half of the display
 _WriteVRAMRightHalf:
 
 	;Writing page address
@@ -523,7 +556,7 @@ _WriteVRAMRightHalf:
 	;Copy data to display
 	set 4, d					;Set D/I pin to data
 	ld a, (hl)					;Copy display data to a
-	call _FlipA					;Mirror contents of a
+	call FlipA					;Mirror contents of a
 
 	call _WriteDisplay
 
@@ -549,9 +582,11 @@ _WriteVRAMColumnDec:
 ;
 ;Output: None
 ;
-;Writes A and the commands spedified in D to the display
+;Writes A and the commands specified in D to the display
+;
+;Fix: 74cc
 _WriteDisplay:
-	.echo "WriteDisplay ",_WriteDisplay;Address of the subroutine
+	.echo "WriteDisplay	",_WriteDisplay;Address of the subroutine
 	;a	= Display data / command pins
 	;d	= Display half + D/I command pins
 
@@ -561,7 +596,7 @@ _WriteDisplay:
 	out (_DisplayCmd), a
 	res 5, a					;Disable enable pin to trigger falling edge
 	nop
-	nop
+	nop							;TODO:Check if the nops can be removed
 	nop
 	out (_DisplayCmd), a		;Write disabled enable pin
 
@@ -574,8 +609,10 @@ _WriteDisplay:
 ;Output: None
 ;
 ;Sets the correct pins for the display, resets cursor to 0,0
+;
+;Fix: 79cc
 _DisplayInit:
-	.echo "DisplayInit ",_DisplayInit;Address of the subroutine
+	.echo "DisplayInit	",_DisplayInit;Address of the subroutine
 	;a	= Pins for display control / resetting sprite cursor position
 	push af
 
@@ -598,8 +635,10 @@ _DisplayInit:
 ;Output: None
 ;
 ;Turn the display on
-_DisplayOn:	
-	.echo "DisplayOn ",_DisplayOn;Address of the subroutine
+;
+;Fix: 109cc
+DisplayOn:	
+	.echo "DisplayOn	",DisplayOn;Address of the subroutine
 	;a	= Display command
 	push af
 
@@ -613,8 +652,10 @@ _DisplayOn:
 ;Output: None
 ;
 ;Turn the display off
-_DisplayOff:
-	.echo "DisplayOff ",_DisplayOff;Address of the subroutine
+;
+;Fix: 97cc
+DisplayOff:
+	.echo "DisplayOff	",DisplayOff;Address of the subroutine
 	;a	= Display command
 	push af
 
@@ -651,19 +692,44 @@ __UsefulRoutines:
 ;Output: A
 ;
 ;Flips the contents of the A register
-_FlipA:
-	.echo "FlipA ",_FlipA
-	push bc							;Preserve bc registers
-	ld c, a							;Load a into c
-	xor a							;Clear a
-	ld b, $07						;Start value for loop
+;
+;Fix: 211cc
+FlipA:
+	.echo "FlipA	",FlipA;Address of the subroutine
+
+	push	bc						;Preserve bc registers
+	ld		c, a					;Load a into c
+	xor		a						;Clear a
+	ld		b, $07					;Start value for loop
 
 _FlipALoop:							;Don't call
-	rr c							;Rotate c right
+	rr		c						;Rotate c right
 	rla								;Rotate the carry into a from the left
 
-	djnz _FlipALoop					;Loop until b=0
-	pop bc
+	djnz	_FlipALoop				;Loop until b=0
+	pop		bc
+	ret
+
+
+
+;Input:		A
+;
+;Output:	F
+;
+;Puts the contents of A in F
+;
+;Fix: 60cc
+SetFA:
+	.echo "SetFA	",SetFA;Address of the subroutine
+	push	bc				;Store BC
+
+	ld		c, a			;Put AA in BC
+	ld		b, a			;
+
+	push	bc				;Put BC(AA) in AF
+	pop		af				;
+
+	pop		bc				;Restore BC
 	ret
 
 
@@ -674,7 +740,7 @@ _FlipALoop:							;Don't call
 ;
 ;Multiplies A by B (Unsigned)
 _MultAB:
-	.echo "MultAB ",_MultAB
+	.echo "MultAB	",_MultAB
 	;Registers affected: de, hl
 	push de
 
@@ -700,8 +766,8 @@ __CodeSize:							;Used to indicate code size during assembly
 ;#include "inc/logo.inc"				;Z80 logo
 
 .echo ""
-.echo "Size of script in bytes: ",__CodeSize
+.echo "Size of script in bytes:	",__CodeSize
 __FileSize:							;Used to indicate total file size during assembly
-.echo "Total file size in bytes: ",__FileSize
+.echo "Total file size in bytes:	",__FileSize
 
 ;--------------------------------

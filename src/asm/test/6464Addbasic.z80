@@ -1,0 +1,36 @@
+	ld hl,_num2
+	ld de,_num1
+
+UAdd64HLDE:
+	.echo "UAdd64HLDE	",UAdd64HLDE;Address of the subroutine
+	;Affected registers: 
+
+	ld		b, 7				;Loop 8 times
+	scf							;Set carry flag to 0 for first add
+	ccf							;
+
+_UAdd64HLDEloop:
+	ld		a, (de)
+	ld		c, (hl)
+	adc		a,c
+
+	ld		(hl),a				;Store result
+	
+	inc hl						;Shouldn't affect carry flag
+	inc de						;
+
+	djnz	_UAdd64HLDEloop
+
+	halt
+
+_num1:
+.dw $6789
+.dw	$2345
+.dw	$ef01
+.dw	$abcd
+
+_num2:
+.dw	$aaaa
+.dw	$aaaa
+.dw	$aaaa
+.dw	$aaaa

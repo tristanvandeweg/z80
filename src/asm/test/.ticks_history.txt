@@ -1,14 +1,5 @@
 reg
 help
-stack
-quit
-reg
-exit
-quit
-reg
-nexti
-reg
-help
 reg
 quit
 reg
@@ -98,3 +89,12 @@ reg
 nexti
 reg
 quit
+reg
+stepi
+reg
+quit
+reg
+help
+x 0000
+quit
+x

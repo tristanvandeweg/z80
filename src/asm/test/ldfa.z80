@@ -1,0 +1,20 @@
+	ld a, $55
+;Input:		A
+;
+;Output:	F
+;
+;Puts the contents of A in F
+;
+;Fix: 60cc
+SetFA:
+	.echo "SetFA ",SetFA;Address of the subroutine
+	push bc					;Store BC
+
+	ld c, a					;Put AA in BC
+	ld b, a					;
+
+	push bc					;Put BC(AA) in AF
+	pop af					;
+
+	pop bc					;Restore BC
+	ret

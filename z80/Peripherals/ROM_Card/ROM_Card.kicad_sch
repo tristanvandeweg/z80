@@ -4,6 +4,12 @@
 
   (paper "A4")
 
+  (title_block
+    (title "z80 ROM Card")
+    (date "2024-03-07")
+    (rev "1.0")
+  )
+
   (lib_symbols
     (symbol "74xGxx:74AHC1G02" (in_bom yes) (on_board yes)
       (property "Reference" "U" (at -2.54 3.81 0)
@@ -1475,7 +1481,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 77.47 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1190873e-de9c-4104-98e6-8cd183a3ace0)
-    (property "Reference" "SW1" (at 100.33 77.47 0)
+    (property "Reference" "ID0" (at 100.33 77.47 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 72.39 0)
@@ -1493,7 +1499,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW1") (unit 1)
+          (reference "ID0") (unit 1)
         )
       )
     )
@@ -1707,7 +1713,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 130.81 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3e5f35d6-919e-4feb-b7cc-0cb0cb6cb31c)
-    (property "Reference" "SW8" (at 100.33 130.81 0)
+    (property "Reference" "ID7" (at 100.33 130.81 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 125.73 0)
@@ -1725,7 +1731,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW8") (unit 1)
+          (reference "ID7") (unit 1)
         )
       )
     )
@@ -1813,7 +1819,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 184.785 86.36 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4d7ba949-0d0f-401b-97fd-0db07b652a8f)
-    (property "Reference" "SW9" (at 183.515 86.36 0)
+    (property "Reference" "SCS1" (at 183.515 86.36 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 184.785 81.28 0)
@@ -1831,7 +1837,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW9") (unit 1)
+          (reference "SCS1") (unit 1)
         )
       )
     )
@@ -1846,7 +1852,7 @@
     (property "Value" "SST39SF040" (at 210.4741 26.67 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Package_SO:TSOP-I-32_14.4x8mm_P0.5mm" (at 208.28 53.34 0)
+    (property "Footprint" "Package_LCC:PLCC-32_THT-Socket" (at 208.28 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "http://ww1.microchip.com/downloads/en/DeviceDoc/25022B.pdf" (at 208.28 53.34 0)
@@ -1971,7 +1977,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 115.57 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 67f6a3ae-6376-4b7f-8394-4a0018759480)
-    (property "Reference" "SW6" (at 100.33 115.57 0)
+    (property "Reference" "ID5" (at 100.33 115.57 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 110.49 0)
@@ -1989,7 +1995,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW6") (unit 1)
+          (reference "ID5") (unit 1)
         )
       )
     )
@@ -1998,7 +2004,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 85.09 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6de4a4a2-25d2-4b97-a212-b23a276cb395)
-    (property "Reference" "SW2" (at 100.33 85.09 0)
+    (property "Reference" "ID1" (at 100.33 85.09 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 80.01 0)
@@ -2016,7 +2022,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW2") (unit 1)
+          (reference "ID1") (unit 1)
         )
       )
     )
@@ -2050,7 +2056,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 100.33 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8bdb706c-01b8-416f-9676-0d61ee0658ef)
-    (property "Reference" "SW4" (at 100.33 100.33 0)
+    (property "Reference" "ID3" (at 100.33 100.33 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 95.25 0)
@@ -2068,7 +2074,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW4") (unit 1)
+          (reference "ID3") (unit 1)
         )
       )
     )
@@ -2227,7 +2233,7 @@
     (property "Value" "74LS174" (at 135.5441 13.97 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (at 133.35 29.21 0)
+    (property "Footprint" "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" (at 133.35 29.21 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "http://www.ti.com/lit/gpn/sn74LS174" (at 133.35 29.21 0)
@@ -2261,7 +2267,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 183.515 66.04 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ba4e9d34-4858-4487-a6c8-ef6fd48cf1bc)
-    (property "Reference" "SW10" (at 182.245 66.04 0)
+    (property "Reference" "SA14" (at 182.245 66.04 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 183.515 60.96 0)
@@ -2279,7 +2285,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW10") (unit 1)
+          (reference "SA14") (unit 1)
         )
       )
     )
@@ -2338,7 +2344,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 92.71 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c1a4bc4d-fa07-4de9-8c9e-bb94aab1b611)
-    (property "Reference" "SW3" (at 100.33 92.71 0)
+    (property "Reference" "ID2" (at 100.33 92.71 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 87.63 0)
@@ -2356,7 +2362,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW3") (unit 1)
+          (reference "ID2") (unit 1)
         )
       )
     )
@@ -2440,7 +2446,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 123.19 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e01c906e-e339-4b4d-b87e-16ae633b1fca)
-    (property "Reference" "SW7" (at 100.33 123.19 0)
+    (property "Reference" "ID6" (at 100.33 123.19 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 118.11 0)
@@ -2458,7 +2464,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW7") (unit 1)
+          (reference "ID6") (unit 1)
         )
       )
     )
@@ -2536,7 +2542,7 @@
   (symbol (lib_id "Switch:SW_SPDT") (at 101.6 107.95 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ec666614-18e1-4e5e-8b25-2be4f283ef9e)
-    (property "Reference" "SW5" (at 100.33 107.95 0)
+    (property "Reference" "ID4" (at 100.33 107.95 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPDT" (at 101.6 102.87 0)
@@ -2554,7 +2560,7 @@
     (instances
       (project "ROM_Card"
         (path "/5ffe5182-cc98-4b6a-b75c-eae8ba1b784e"
-          (reference "SW5") (unit 1)
+          (reference "ID4") (unit 1)
         )
       )
     )

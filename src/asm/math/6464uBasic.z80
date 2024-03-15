@@ -1,0 +1,41 @@
+;Basic 64-64-bit unsigned math functions
+;Copyright (C) 2024 Tristan van de Weg
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License along
+;    with this program; if not, write to the Free Software Foundation, Inc.,
+;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+;Input:		(HL), (DE)
+;
+;Output:	(HL),C=(HL)+(DE)
+;
+;Adds the 8 bytes starting at HL to the 8 bytes starting at DE the resulting number is stored at HL (unsigned)
+;
+;Max: 408cc, Min: 142cc TODO: fix timings
+UAdd64HLDE:
+	.echo "UAdd64HLDE	",UAdd64HLDE;Address of the subroutine
+	;Affected registers: 
+
+	ld		b, 7				;Loop 8 times
+	scf							;Set carry flag to 0 for first add
+	ccf							;
+
+_UAdd64HLDEloop:
+	ld		a, (de)
+	ld		c, (hl)
+	adc		a,c
+
+	inc hl						;Shouldn't affect carry flag
+	inc de						;
+
+	djnz	_UAdd64HLDEloop

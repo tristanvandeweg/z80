@@ -22,7 +22,7 @@
 ;
 ;Multiplies D by E (unsigned), the 16-bit result is returned in DE
 ;
-;Max: 408cc, Min: 366cc
+;Max: 408cc, Min: 142cc TODO: fix timings
 UMultDE:
 	.echo "UMultDE ",UMultDE;Address of the subroutine
 	;Affected registers: af, bc, hl
@@ -63,7 +63,7 @@ _UMultDEloop:
 ;
 ;Divides D by E (unsigned), the result is returned in D and the remainder in E
 ;
-;xxxx cc TODO: calculate speed
+;Max: 414cc, Min: 95cc TODO:Fix timings
 UDivDE:
 	.echo "UDivDE ",UDivDE;Address of the subroutine
 	;Affected registers: af, bc

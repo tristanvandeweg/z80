@@ -5,9 +5,17 @@
  * 4KB  4096
  * 8KB  8192
  */
-#define SHIFT_DATA 15
-#define SHIFT_SRCLK 14
-#define SHIFT_RCLK 16
+
+// Pin definitions for rev1
+//#define SHIFT_DATA 15
+//#define SHIFT_SRCLK 14
+//#define SHIFT_RCLK 16
+
+// Pin definitions for rev2
+#define SHIFT_DATA 13
+#define SHIFT_SRCLK 12
+#define SHIFT_RCLK 11
+
 #define EEPROM_D0 2
 #define EEPROM_D7 9
 #define WRITE_EN A1
@@ -110,20 +118,32 @@ void blockWrite(uint32_t _numBytes, bool _verify) { // Write multiple bytes sequ
 
 void setup() {
   pinMode(ENABLE, OUTPUT);
-  digitalWrite(ENABLE, HIGH);
+  digitalWrite(ENABLE, HIGH); // Disable output of shift registers when not connected to serial
+
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, INPUT);
   }
   
   Serial.begin(115200);
   while(!Serial){} // Wait for a serial connection
+  delay(1000);
+
   // Request usage of the system bus
   pinMode(BUSACK, INPUT);
   pinMode(BUSREQ, OUTPUT);
   digitalWrite(BUSREQ, LOW);
   delay(100);
   Serial.print("Waiting for the z80 to enter high-impedance state");
-  while(digitalRead(BUSACK)){Serial.print(".");delay(500);} // wait until z80 is ready
+  int connectionTest = 10; // How long to wait for the busack
+  while(digitalRead(BUSACK)){
+    Serial.print(".");delay(500);
+    connectionTest--; // If the z80 takes too long to respond, stop the program
+    if(connectionTest == 0){
+      Serial.println("");
+      Serial.println("Timed out waiting for z80, halting.");
+      while(true){}
+    }
+  } // wait until z80 is ready
   Serial.println("");
 
   // Set up shift register pins

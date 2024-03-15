@@ -20,8 +20,8 @@
 ;--------------------------------
 _ExtIndPrgm	.equ $80			;=Byte to indicate large external program
 _ExtIndPrg2	.equ $81			;=Byte to indicate small external program
-_ExtIndRAM	.equ $ab			;=Byte to indicate large external RAM
-_ExtIndRAM2	.equ $ac			;=Byte to indicate small external RAM
+_ExtIndRAM	.equ $a0			;=Byte to indicate large external RAM
+_ExtIndRAM2	.equ $a1			;=Byte to indicate small external RAM
 _ExtIndIO	.equ $10			;=Byte to indicate external IO
 
 _StackSize 	.equ $ff			;=255
